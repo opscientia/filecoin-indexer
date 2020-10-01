@@ -2,8 +2,10 @@ package indexing
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/filecoin-project/lotus/api"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 )
@@ -27,12 +29,30 @@ func (t *MinerFetcherTask) GetName() string {
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	minerAddresses, err := t.client.Miner.GetAddressesByHeight(payload.currentHeight)
+	minersAddresses, err := t.client.Miner.GetAddressesByHeight(payload.currentHeight)
 	if err != nil {
 		return err
 	}
 
-	payload.MinerAddresses = minerAddresses
+	payload.MinersAddresses = minersAddresses
+	payload.MinersInfo = make([]*api.MinerInfo, len(minersAddresses))
+	payload.MinersPower = make([]*api.MinerPower, len(minersAddresses))
+
+	for i, minerAddress := range minersAddresses {
+		minerInfo, err := t.client.Miner.GetInfoByHeight(minerAddress, payload.currentHeight)
+		if err != nil {
+			return err
+		}
+		payload.MinersInfo[i] = minerInfo
+
+		minerPower, err := t.client.Miner.GetPowerByHeight(minerAddress, payload.currentHeight)
+		if err != nil {
+			return err
+		}
+		payload.MinersPower[i] = minerPower
+
+		fmt.Println("Fetched", i+1, "out of", len(minersAddresses), "miners")
+	}
 
 	return nil
 }

@@ -28,12 +28,23 @@ func (t *MinerPersistorTask) GetName() string {
 func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	for _, minerAddress := range *payload.MinerAddresses {
-		miner := model.Miner{
-			Address: minerAddress.String(),
-		}
+	for i, minerAddress := range payload.MinersAddresses {
+		miner := model.Miner{}
 
-		t.store.Db.FirstOrCreate(&miner, miner)
+		sectorSize := uint64(payload.MinersInfo[i].SectorSize)
+		rawBytePower := payload.MinersPower[i].MinerPower.RawBytePower.Uint64()
+		qualityAdjPower := payload.MinersPower[i].MinerPower.QualityAdjPower.Uint64()
+
+		t.store.Db.
+			Where(model.Miner{
+				Address: minerAddress.String(),
+			}).
+			Assign(model.Miner{
+				SectorSize:      &sectorSize,
+				RawBytePower:    &rawBytePower,
+				QualityAdjPower: &qualityAdjPower,
+			}).
+			FirstOrCreate(&miner)
 	}
 
 	return nil

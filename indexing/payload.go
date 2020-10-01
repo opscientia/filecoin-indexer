@@ -3,6 +3,7 @@ package indexing
 import (
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/lotus/api"
 )
 
 var (
@@ -23,7 +24,9 @@ func (pf *payloadFactory) GetPayload(height int64) pipeline.Payload {
 type payload struct {
 	currentHeight int64
 
-	MinerAddresses *[]address.Address
+	MinersAddresses []address.Address
+	MinersInfo      []*api.MinerInfo
+	MinersPower     []*api.MinerPower
 }
 
 func (p *payload) SetCurrentHeight(height int64) {
