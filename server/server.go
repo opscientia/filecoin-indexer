@@ -9,7 +9,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-func Run(listenAddr string, store *store.Store) {
+func Run(listenAddr string, store *store.Store) error {
 	router := gin.Default()
 
 	router.GET("/miners", func(ctx *gin.Context) {
@@ -20,5 +20,5 @@ func Run(listenAddr string, store *store.Store) {
 		ctx.JSON(http.StatusOK, miners)
 	})
 
-	router.Run(listenAddr)
+	return router.Run(listenAddr)
 }
