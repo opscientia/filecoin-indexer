@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"gorm.io/gorm/logger"
+
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/store"
@@ -73,7 +75,12 @@ func initConfig(path string) (*config.Config, error) {
 }
 
 func initStore(cfg *config.Config) (*store.Store, error) {
-	store, err := store.New(cfg.DatabaseDSN)
+	logMode := logger.Warn
+	if cfg.Debug {
+		logMode = logger.Info
+	}
+
+	store, err := store.New(cfg.DatabaseDSN, logMode)
 	if err != nil {
 		return nil, err
 	}

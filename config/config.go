@@ -20,6 +20,7 @@ type Config struct {
 	DatabaseDSN string `json:"database_dsn" envconfig:"DATABASE_DSN"`
 	ServerAddr  string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
 	ServerPort  int64  `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
+	Debug       bool   `json:"debug" envconfig:"DEBUG"`
 }
 
 // New returns a new configuration

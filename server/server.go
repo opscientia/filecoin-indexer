@@ -9,6 +9,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
+// Run runs an HTTP server
 func Run(listenAddr string, store *store.Store) error {
 	router := gin.Default()
 
