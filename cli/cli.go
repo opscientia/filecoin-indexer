@@ -13,11 +13,13 @@ import (
 // Run executes the command line interface
 func Run() {
 	var command string
+	var configPath string
 
 	flag.StringVar(&command, "cmd", "", "Command to run")
+	flag.StringVar(&configPath, "config", "", "Path to a config file")
 	flag.Parse()
 
-	cfg, err := initConfig()
+	cfg, err := initConfig(configPath)
 	if err != nil {
 		terminate(err)
 	}
@@ -50,10 +52,20 @@ func terminate(message interface{}) {
 	}
 }
 
-func initConfig() (*config.Config, error) {
+func initConfig(path string) (*config.Config, error) {
 	cfg := config.New()
 
 	if err := config.FromEnv(cfg); err != nil {
+		return nil, err
+	}
+
+	if path != "" {
+		if err := config.FromFile(path, cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
 
