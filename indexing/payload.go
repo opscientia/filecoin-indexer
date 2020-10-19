@@ -27,8 +27,8 @@ type payload struct {
 	currentHeight int64
 
 	MinersAddresses []address.Address
-	MinersInfo      []*api.MinerInfo
-	MinersPower     []*api.MinerPower
+	MinersInfo      map[address.Address]*api.MinerInfo
+	MinersPower     map[address.Address]*api.MinerPower
 
 	Miners []*model.Miner
 }

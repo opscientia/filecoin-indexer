@@ -24,24 +24,22 @@ func (t *MinerParserTask) GetName() string {
 func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	payload.Miners = make([]*model.Miner, len(payload.MinersAddresses))
-
-	for i, minerAddress := range payload.MinersAddresses {
-		sectorSize := uint64(payload.MinersInfo[i].SectorSize)
-		rawBytePower := payload.MinersPower[i].MinerPower.RawBytePower.Uint64()
-		qualityAdjPower := payload.MinersPower[i].MinerPower.QualityAdjPower.Uint64()
-		totalPower := payload.MinersPower[i].TotalPower.QualityAdjPower.Uint64()
+	for _, address := range payload.MinersAddresses {
+		sectorSize := uint64(payload.MinersInfo[address].SectorSize)
+		rawBytePower := payload.MinersPower[address].MinerPower.RawBytePower.Uint64()
+		qualityAdjPower := payload.MinersPower[address].MinerPower.QualityAdjPower.Uint64()
+		totalPower := payload.MinersPower[address].TotalPower.QualityAdjPower.Uint64()
 		relativePower := float64(qualityAdjPower) / float64(totalPower)
 
 		miner := model.Miner{
-			Address:         minerAddress.String(),
+			Address:         address.String(),
 			SectorSize:      &sectorSize,
 			RawBytePower:    &rawBytePower,
 			QualityAdjPower: &qualityAdjPower,
 			RelativePower:   &relativePower,
 		}
 
-		payload.Miners[i] = &miner
+		payload.Miners = append(payload.Miners, &miner)
 	}
 
 	return nil

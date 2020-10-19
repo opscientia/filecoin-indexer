@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/api"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -33,23 +34,23 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	if err != nil {
 		return err
 	}
-
 	payload.MinersAddresses = minersAddresses
-	payload.MinersInfo = make([]*api.MinerInfo, len(minersAddresses))
-	payload.MinersPower = make([]*api.MinerPower, len(minersAddresses))
 
-	for i, minerAddress := range minersAddresses {
-		minerInfo, err := t.client.Miner.GetInfoByHeight(minerAddress, payload.currentHeight)
+	payload.MinersInfo = make(map[address.Address]*api.MinerInfo)
+	payload.MinersPower = make(map[address.Address]*api.MinerPower)
+
+	for i, address := range minersAddresses {
+		minerInfo, err := t.client.Miner.GetInfoByHeight(address, payload.currentHeight)
 		if err != nil {
 			return err
 		}
-		payload.MinersInfo[i] = minerInfo
+		payload.MinersInfo[address] = minerInfo
 
-		minerPower, err := t.client.Miner.GetPowerByHeight(minerAddress, payload.currentHeight)
+		minerPower, err := t.client.Miner.GetPowerByHeight(address, payload.currentHeight)
 		if err != nil {
 			return err
 		}
-		payload.MinersPower[i] = minerPower
+		payload.MinersPower[address] = minerPower
 
 		fmt.Println("Fetched", i+1, "out of", len(minersAddresses), "miners")
 	}
