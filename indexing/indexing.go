@@ -13,6 +13,7 @@ func StartPipeline(client *client.Client, store *store.Store) error {
 	p := pipeline.NewDefault(NewPayloadFactory())
 
 	p.SetTasks(pipeline.StageFetcher, NewMinerFetcherTask(client))
+	p.SetTasks(pipeline.StageParser, NewMinerParserTask())
 	p.SetTasks(pipeline.StagePersistor, NewMinerPersistorTask(store))
 
 	err := p.Start(context.Background(), NewSource(), NewSink(), &pipeline.Options{})

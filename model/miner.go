@@ -2,12 +2,14 @@ package model
 
 import "time"
 
+// Miner represents a storage miner
 type Miner struct {
 	ID              uint      `json:"-" gorm:"primary_key"`
 	Address         string    `json:"address"`
+	SectorSize      *uint64   `json:"sector_size"`
 	RawBytePower    *uint64   `json:"raw_byte_power"`
 	QualityAdjPower *uint64   `json:"quality_adj_power"`
-	SectorSize      *uint64   `json:"sector_size"`
+	RelativePower   *float64  `json:"relative_power"`
 	CreatedAt       time.Time `json:"-"`
 	UpdatedAt       time.Time `json:"-"`
 }

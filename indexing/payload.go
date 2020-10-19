@@ -1,9 +1,11 @@
 package indexing
 
 import (
-	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/api"
+
+	"github.com/figment-networks/filecoin-indexer/model"
+	"github.com/figment-networks/indexing-engine/pipeline"
 )
 
 var (
@@ -27,6 +29,8 @@ type payload struct {
 	MinersAddresses []address.Address
 	MinersInfo      []*api.MinerInfo
 	MinersPower     []*api.MinerPower
+
+	Miners []*model.Miner
 }
 
 func (p *payload) SetCurrentHeight(height int64) {
