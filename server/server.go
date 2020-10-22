@@ -21,5 +21,13 @@ func Run(listenAddr string, store *store.Store) error {
 		ctx.JSON(http.StatusOK, miners)
 	})
 
+	router.GET("/top_miners", func(ctx *gin.Context) {
+		var miners []model.Miner
+
+		store.Db.Order("score DESC").Limit(100).Find(&miners)
+
+		ctx.JSON(http.StatusOK, miners)
+	})
+
 	return router.Run(listenAddr)
 }

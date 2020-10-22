@@ -29,7 +29,7 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		rawBytePower := payload.MinersPower[address].MinerPower.RawBytePower.Uint64()
 		qualityAdjPower := payload.MinersPower[address].MinerPower.QualityAdjPower.Uint64()
 		totalPower := payload.MinersPower[address].TotalPower.QualityAdjPower.Uint64()
-		relativePower := float64(qualityAdjPower) / float64(totalPower)
+		relativePower := float32(float64(qualityAdjPower) / float64(totalPower))
 
 		score := calculateScore(relativePower, sectorSize)
 
@@ -48,7 +48,7 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 	return nil
 }
 
-func calculateScore(relativePower float64, sectorSize uint64) uint32 {
+func calculateScore(relativePower float32, sectorSize uint64) uint32 {
 	const sectorSizeBaseline = 32 * 1024 * 1024 * 1024
 
 	powerScore := relativePower
