@@ -9,6 +9,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
+// StartPipeline runs the indexing pipeline
 func StartPipeline(client *client.Client, store *store.Store) error {
 	p := pipeline.NewDefault(NewPayloadFactory())
 

@@ -9,22 +9,22 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-const (
-	MinerPersistorTaskName = "MinerPersistor"
-)
-
+// MinerPersistorTask stores miners in the database
 type MinerPersistorTask struct {
 	store *store.Store
 }
 
+// NewMinerPersistorTask creates the task
 func NewMinerPersistorTask(store *store.Store) pipeline.Task {
 	return &MinerPersistorTask{store: store}
 }
 
+// GetName returns the task name
 func (t *MinerPersistorTask) GetName() string {
-	return MinerPersistorTaskName
+	return "MinerPersistor"
 }
 
+// Run performs the task
 func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
@@ -40,6 +40,7 @@ func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error 
 				RawBytePower:    miner.RawBytePower,
 				QualityAdjPower: miner.QualityAdjPower,
 				RelativePower:   miner.RelativePower,
+				Score:           miner.Score,
 			}).
 			FirstOrCreate(&m)
 	}

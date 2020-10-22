@@ -10,6 +10,7 @@ type Miner struct {
 	RawBytePower    *uint64   `json:"raw_byte_power"`
 	QualityAdjPower *uint64   `json:"quality_adj_power"`
 	RelativePower   *float64  `json:"relative_power"`
+	Score           *uint32   `json:"score"`
 	CreatedAt       time.Time `json:"-"`
 	UpdatedAt       time.Time `json:"-"`
 }

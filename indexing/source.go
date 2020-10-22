@@ -6,6 +6,7 @@ import (
 	"github.com/figment-networks/indexing-engine/pipeline"
 )
 
+// NewSource creates a pipeline source
 func NewSource() pipeline.Source {
 	return &source{}
 }

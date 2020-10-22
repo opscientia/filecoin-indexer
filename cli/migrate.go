@@ -23,5 +23,10 @@ func runMigrations(cfg *config.Config) error {
 		dir = path.Join(path.Dir(filename), "../migrations")
 	}
 
-	return goose.Up(store.Conn(), dir)
+	conn, err := store.Conn()
+	if err != nil {
+		return err
+	}
+
+	return goose.Up(conn, dir)
 }

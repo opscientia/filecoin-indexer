@@ -8,12 +8,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// Store handles all database operations
+// Store handles database operations
 type Store struct {
 	Db *gorm.DB
 }
 
-// New returns a new store from the connection string
+// New creates a store from the connection string
 func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 	config := gorm.Config{
 		Logger: logger.Default.LogMode(logMode),
@@ -27,18 +27,17 @@ func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 	return &Store{Db: db}, nil
 }
 
-// Conn returns an underlying database connection
-func (s *Store) Conn() *sql.DB {
-	db, _ := s.Db.DB()
-	return db
+// Conn returns the underlying database connection
+func (s *Store) Conn() (*sql.DB, error) {
+	return s.Db.DB()
 }
 
 // Close closes the database connection
 func (s *Store) Close() error {
-	db, err := s.Db.DB()
+	conn, err := s.Conn()
 	if err != nil {
 		return err
 	}
 
-	return db.Close()
+	return conn.Close()
 }

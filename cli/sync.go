@@ -10,6 +10,7 @@ func runSync(cfg *config.Config) error {
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	store, err := initStore(cfg)
 	if err != nil {

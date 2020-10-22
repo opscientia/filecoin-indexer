@@ -3,6 +3,7 @@ package indexing
 import (
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/api"
+	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
 
 	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/indexing-engine/pipeline"
@@ -13,6 +14,7 @@ var (
 	_ pipeline.Payload        = (*payload)(nil)
 )
 
+// NewPayloadFactory creates a payload factory
 func NewPayloadFactory() *payloadFactory {
 	return &payloadFactory{}
 }
@@ -27,7 +29,7 @@ type payload struct {
 	currentHeight int64
 
 	MinersAddresses []address.Address
-	MinersInfo      map[address.Address]*api.MinerInfo
+	MinersInfo      map[address.Address]*miner.MinerInfo
 	MinersPower     map[address.Address]*api.MinerPower
 
 	Miners []*model.Miner

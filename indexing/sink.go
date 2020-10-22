@@ -7,6 +7,7 @@ import (
 	"github.com/figment-networks/indexing-engine/pipeline"
 )
 
+// NewSink creates a pipeline sink
 func NewSink() pipeline.Sink {
 	return &sink{}
 }

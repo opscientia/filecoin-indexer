@@ -1,49 +1,51 @@
 package client
 
 import (
+	"context"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/api"
-	"github.com/ybbus/jsonrpc"
+	"github.com/filecoin-project/lotus/api/apistruct"
+	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
+	"github.com/filecoin-project/lotus/chain/types"
 )
 
+// MinerClient fetches miner information
 type MinerClient interface {
-	GetAddressesByHeight(int64) ([]address.Address, error)
-	GetInfoByHeight(address.Address, int64) (*api.MinerInfo, error)
-	GetPowerByHeight(address.Address, int64) (*api.MinerPower, error)
+	GetAddresses() ([]address.Address, error)
+	GetInfo(address.Address) (*miner.MinerInfo, error)
+	GetPower(address.Address) (*api.MinerPower, error)
 }
 
 type minerClient struct {
-	client *jsonrpc.RPCClient
+	api *apistruct.FullNodeStruct
 }
 
 var (
 	_ MinerClient = (*minerClient)(nil)
 )
 
-func NewMinerClient(client *jsonrpc.RPCClient) MinerClient {
-	return &minerClient{client: client}
+// NewMinerClient creates a miner client
+func NewMinerClient(api *apistruct.FullNodeStruct) MinerClient {
+	return &minerClient{api: api}
 }
 
-func (mc *minerClient) GetAddressesByHeight(height int64) ([]address.Address, error) {
-	var addresses []address.Address
-
-	err := (*mc.client).CallFor(&addresses, "Filecoin.StateListMiners", nil)
-
-	return addresses, err
+// GetAddresses fetches miners' addresses
+func (mc *minerClient) GetAddresses() ([]address.Address, error) {
+	return mc.api.StateListMiners(context.Background(), types.EmptyTSK)
 }
 
-func (mc *minerClient) GetInfoByHeight(address address.Address, height int64) (*api.MinerInfo, error) {
-	var minerInfo api.MinerInfo
+// GetInfo fetches miner's information
+func (mc *minerClient) GetInfo(address address.Address) (*miner.MinerInfo, error) {
+	info, err := mc.api.StateMinerInfo(context.Background(), address, types.EmptyTSK)
+	if err != nil {
+		return nil, err
+	}
 
-	err := (*mc.client).CallFor(&minerInfo, "Filecoin.StateMinerInfo", address, nil)
-
-	return &minerInfo, err
+	return &info, nil
 }
 
-func (mc *minerClient) GetPowerByHeight(address address.Address, height int64) (*api.MinerPower, error) {
-	var minerPower api.MinerPower
-
-	err := (*mc.client).CallFor(&minerPower, "Filecoin.StateMinerPower", address, nil)
-
-	return &minerPower, err
+// GetPower fetches miner's power
+func (mc *minerClient) GetPower(address address.Address) (*api.MinerPower, error) {
+	return mc.api.StateMinerPower(context.Background(), address, types.EmptyTSK)
 }

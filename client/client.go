@@ -1,21 +1,43 @@
 package client
 
 import (
-	"github.com/ybbus/jsonrpc"
+	"context"
+	"net/http"
+
+	"github.com/filecoin-project/go-jsonrpc"
+	"github.com/filecoin-project/lotus/api/apistruct"
 )
 
+// Client fetches data from a Filecoin node
 type Client struct {
-	client *jsonrpc.RPCClient
+	api    *apistruct.FullNodeStruct
+	closer jsonrpc.ClientCloser
 
 	Miner MinerClient
 }
 
-func New(endpoint string) *Client {
-	client := jsonrpc.NewClient(endpoint)
+// New creates a Filecoin client
+func New(endpoint string) (*Client, error) {
+	var api apistruct.FullNodeStruct
+
+	ctx := context.Background()
+	addr := "ws://" + endpoint + "/rpc/v0"
+	outs := []interface{}{&api.Internal, &api.CommonStruct.Internal}
+
+	closer, err := jsonrpc.NewMergeClient(ctx, addr, "Filecoin", outs, http.Header{})
+	if err != nil {
+		return nil, err
+	}
 
 	return &Client{
-		client: &client,
+		api:    &api,
+		closer: closer,
 
-		Miner: NewMinerClient(&client),
-	}
+		Miner: NewMinerClient(&api),
+	}, nil
+}
+
+// Close closes the websocket connection
+func (c *Client) Close() {
+	c.closer()
 }

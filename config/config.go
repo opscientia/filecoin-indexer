@@ -10,20 +10,20 @@ import (
 )
 
 var (
-	errNodeRequired     = errors.New("Filecoin node URL is required")
+	errEndpointRequired = errors.New("Filecoin RPC endpoint is required")
 	errDatabaseRequired = errors.New("Database credentials are required")
 )
 
 // Config holds the configuration data
 type Config struct {
-	NodeURL     string `json:"node_url" envconfig:"NODE_URL"`
+	RPCEndpoint string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
 	DatabaseDSN string `json:"database_dsn" envconfig:"DATABASE_DSN"`
 	ServerAddr  string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
 	ServerPort  int64  `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
 	Debug       bool   `json:"debug" envconfig:"DEBUG"`
 }
 
-// New returns a new configuration
+// New creates a new configuration
 func New() *Config {
 	return &Config{}
 }
@@ -42,10 +42,10 @@ func FromFile(path string, config *Config) error {
 	return json.Unmarshal(data, config)
 }
 
-// Validate returns an error if the configuration is invalid
+// Validate checks if the configuration is valid
 func (c *Config) Validate() error {
-	if c.NodeURL == "" {
-		return errNodeRequired
+	if c.RPCEndpoint == "" {
+		return errEndpointRequired
 	}
 
 	if c.DatabaseDSN == "" {
@@ -55,7 +55,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// ListenAddr returns a full listen address
+// ListenAddr returns a listen address
 func (c *Config) ListenAddr() string {
 	return fmt.Sprintf("%s:%d", c.ServerAddr, c.ServerPort)
 }

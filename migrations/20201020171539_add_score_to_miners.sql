@@ -1,7 +1,7 @@
 -- +goose Up
 ALTER TABLE miners
-ADD relative_power REAL;
+ADD score INTEGER;
 
 -- +goose Down
 ALTER TABLE miners
-DROP COLUMN relative_power;
+DROP COLUMN score;
