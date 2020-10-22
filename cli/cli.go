@@ -37,8 +37,8 @@ func Run() {
 
 func runCommand(cfg *config.Config, name string) error {
 	switch name {
-	case "migrate":
-		return runMigrations(cfg)
+	case "migrate", "migrate:up", "migrate:down":
+		return runMigrations(cfg, name)
 	case "sync":
 		return runSync(cfg)
 	case "server":
