@@ -2,6 +2,7 @@ package indexing
 
 import (
 	"github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
 
@@ -10,18 +11,20 @@ import (
 )
 
 var (
-	_ pipeline.PayloadFactory = (*payloadFactory)(nil)
+	_ pipeline.PayloadFactory = (*PayloadFactory)(nil)
 	_ pipeline.Payload        = (*payload)(nil)
 )
 
 // NewPayloadFactory creates a payload factory
-func NewPayloadFactory() *payloadFactory {
-	return &payloadFactory{}
+func NewPayloadFactory() *PayloadFactory {
+	return &PayloadFactory{}
 }
 
-type payloadFactory struct{}
+// PayloadFactory creates payloads
+type PayloadFactory struct{}
 
-func (pf *payloadFactory) GetPayload(height int64) pipeline.Payload {
+// GetPayload returns a payload for a given height
+func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
 	return &payload{currentHeight: height}
 }
 
@@ -31,6 +34,7 @@ type payload struct {
 	MinersAddresses []address.Address
 	MinersInfo      map[address.Address]*miner.MinerInfo
 	MinersPower     map[address.Address]*api.MinerPower
+	MinersFaults    map[address.Address]*bitfield.BitField
 
 	Miners []*model.Miner
 }

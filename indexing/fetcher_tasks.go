@@ -31,29 +31,35 @@ func (t *MinerFetcherTask) GetName() string {
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	minersAddresses, err := t.client.Miner.GetAddresses()
+	addresses, err := t.client.Miner.GetAddresses()
 	if err != nil {
 		return err
 	}
-	payload.MinersAddresses = minersAddresses
+	payload.MinersAddresses = addresses
 
 	payload.MinersInfo = make(map[address.Address]*miner.MinerInfo)
 	payload.MinersPower = make(map[address.Address]*api.MinerPower)
 
-	for i, address := range minersAddresses {
-		minerInfo, err := t.client.Miner.GetInfo(address)
+	for i, address := range addresses {
+		info, err := t.client.Miner.GetInfo(address)
 		if err != nil {
 			return err
 		}
-		payload.MinersInfo[address] = minerInfo
+		payload.MinersInfo[address] = info
 
-		minerPower, err := t.client.Miner.GetPower(address)
+		power, err := t.client.Miner.GetPower(address)
 		if err != nil {
 			return err
 		}
-		payload.MinersPower[address] = minerPower
+		payload.MinersPower[address] = power
 
-		fmt.Println("Fetched", i+1, "out of", len(minersAddresses), "miners")
+		faults, err := t.client.Miner.GetFaults(address)
+		if err != nil {
+			return err
+		}
+		payload.MinersFaults[address] = faults
+
+		fmt.Println("Fetched", i+1, "out of", len(addresses), "miners")
 	}
 
 	return nil

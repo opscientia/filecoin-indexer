@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/api/apistruct"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
@@ -15,6 +16,7 @@ type MinerClient interface {
 	GetAddresses() ([]address.Address, error)
 	GetInfo(address.Address) (*miner.MinerInfo, error)
 	GetPower(address.Address) (*api.MinerPower, error)
+	GetFaults(address.Address) (*bitfield.BitField, error)
 }
 
 type minerClient struct {
@@ -48,4 +50,14 @@ func (mc *minerClient) GetInfo(address address.Address) (*miner.MinerInfo, error
 // GetPower fetches miner's power
 func (mc *minerClient) GetPower(address address.Address) (*api.MinerPower, error) {
 	return mc.api.StateMinerPower(context.Background(), address, types.EmptyTSK)
+}
+
+// GetFaults fetches miner's faults
+func (mc *minerClient) GetFaults(address address.Address) (*bitfield.BitField, error) {
+	faults, err := mc.api.StateMinerFaults(context.Background(), address, types.EmptyTSK)
+	if err != nil {
+		return nil, err
+	}
+
+	return &faults, nil
 }
