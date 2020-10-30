@@ -40,6 +40,7 @@ func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error 
 				RawBytePower:    miner.RawBytePower,
 				QualityAdjPower: miner.QualityAdjPower,
 				RelativePower:   miner.RelativePower,
+				FaultsCount:     miner.FaultsCount,
 				Score:           miner.Score,
 			}).
 			FirstOrCreate(&m)

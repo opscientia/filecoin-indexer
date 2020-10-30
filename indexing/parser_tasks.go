@@ -3,8 +3,10 @@ package indexing
 import (
 	"context"
 
-	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/indexing-engine/pipeline"
+
+	"github.com/figment-networks/filecoin-indexer/model"
+	"github.com/figment-networks/filecoin-indexer/score"
 )
 
 // MinerParserTask transforms raw miner data
@@ -30,8 +32,13 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		qualityAdjPower := payload.MinersPower[i].MinerPower.QualityAdjPower.Uint64()
 		totalPower := payload.MinersPower[i].TotalPower.QualityAdjPower.Uint64()
 		relativePower := float32(float64(qualityAdjPower) / float64(totalPower))
+		faultsCount, _ := payload.MinersFaults[i].Count()
 
-		score := calculateScore(relativePower, sectorSize)
+		score := score.CalculateScore(score.Variables{
+			SectorSize:    sectorSize,
+			RelativePower: relativePower,
+			FaultsCount:   faultsCount,
+		})
 
 		miner := model.Miner{
 			Address:         address.String(),
@@ -39,6 +46,7 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 			RawBytePower:    &rawBytePower,
 			QualityAdjPower: &qualityAdjPower,
 			RelativePower:   &relativePower,
+			FaultsCount:     &faultsCount,
 			Score:           &score,
 		}
 
@@ -46,13 +54,4 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 	}
 
 	return nil
-}
-
-func calculateScore(relativePower float32, sectorSize uint64) uint32 {
-	const sectorSizeBaseline = 32 * 1024 * 1024 * 1024
-
-	powerScore := relativePower
-	sectorSizeScore := sectorSize / sectorSizeBaseline
-
-	return uint32(powerScore*1000) + uint32(sectorSizeScore*10)
 }
