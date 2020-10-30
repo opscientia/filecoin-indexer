@@ -2,10 +2,10 @@ package indexing
 
 import (
 	"context"
-	"fmt"
+	"sync"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
-	"github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
 
@@ -37,30 +37,43 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	}
 	payload.MinersAddresses = addresses
 
-	payload.MinersInfo = make(map[address.Address]*miner.MinerInfo)
-	payload.MinersPower = make(map[address.Address]*api.MinerPower)
+	payload.MinersInfo = make([]*miner.MinerInfo, len(addresses))
+	payload.MinersPower = make([]*api.MinerPower, len(addresses))
+	payload.MinersFaults = make([]*bitfield.BitField, len(addresses))
 
-	for i, address := range addresses {
-		info, err := t.client.Miner.GetInfo(address)
-		if err != nil {
-			return err
-		}
-		payload.MinersInfo[address] = info
+	wg := &sync.WaitGroup{}
 
-		power, err := t.client.Miner.GetPower(address)
-		if err != nil {
-			return err
-		}
-		payload.MinersPower[address] = power
-
-		faults, err := t.client.Miner.GetFaults(address)
-		if err != nil {
-			return err
-		}
-		payload.MinersFaults[address] = faults
-
-		fmt.Println("Fetched", i+1, "out of", len(addresses), "miners")
+	for i := range addresses {
+		wg.Add(1)
+		go fetchMiner(i, t.client.Miner, payload, wg)
 	}
 
+	wg.Wait()
+
 	return nil
+}
+
+func fetchMiner(index int, mc client.MinerClient, p *payload, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	address := p.MinersAddresses[index]
+
+	info, err := mc.GetInfo(address)
+	if err != nil {
+		panic(err)
+	}
+
+	power, err := mc.GetPower(address)
+	if err != nil {
+		panic(err)
+	}
+
+	faults, err := mc.GetFaults(address)
+	if err != nil {
+		panic(err)
+	}
+
+	p.MinersInfo[index] = info
+	p.MinersPower[index] = power
+	p.MinersFaults[index] = faults
 }

@@ -32,9 +32,9 @@ type payload struct {
 	currentHeight int64
 
 	MinersAddresses []address.Address
-	MinersInfo      map[address.Address]*miner.MinerInfo
-	MinersPower     map[address.Address]*api.MinerPower
-	MinersFaults    map[address.Address]*bitfield.BitField
+	MinersInfo      []*miner.MinerInfo
+	MinersPower     []*api.MinerPower
+	MinersFaults    []*bitfield.BitField
 
 	Miners []*model.Miner
 }
