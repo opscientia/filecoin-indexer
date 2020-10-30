@@ -3,7 +3,6 @@ package cli
 import (
 	"path"
 	"runtime"
-	"strings"
 
 	"github.com/pressly/goose"
 
@@ -17,6 +16,11 @@ func runMigrations(cfg *config.Config, cmd string) error {
 	}
 	defer store.Close()
 
+	conn, err := store.Conn()
+	if err != nil {
+		return err
+	}
+
 	dir := "migrations"
 
 	_, filename, _, ok := runtime.Caller(1)
@@ -24,20 +28,10 @@ func runMigrations(cfg *config.Config, cmd string) error {
 		dir = path.Join(path.Dir(filename), "../migrations")
 	}
 
-	conn, err := store.Conn()
-	if err != nil {
-		return err
-	}
-
-	subcmd := "up"
-	if chunks := strings.Split(cmd, ":"); len(chunks) > 1 {
-		subcmd = chunks[1]
-	}
-
-	switch subcmd {
-	case "up":
+	switch cmd {
+	case "migrate":
 		return goose.Up(conn, dir)
-	case "down":
+	case "rollback":
 		return goose.Down(conn, dir)
 	default:
 		return nil

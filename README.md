@@ -33,12 +33,12 @@ $ filecoin-indexer -config path/to/config.json -cmd=COMMAND
 
 Available commands:
 
-| Name                    | Description                                   |
-|-------------------------|-----------------------------------------------|
-| `migrate`, `migrate:up` | Migrates the database                         |
-| `migrate:down`          | Rolls the schema back to the previous version |
-| `sync`                  | Runs the synchronization process              |
-| `server`                | Starts the API server                         |
+| Name       | Description                                   |
+|------------|-----------------------------------------------|
+| `migrate`  | Migrates the database                         |
+| `rollback` | Rolls the schema back to the previous version |
+| `sync`     | Runs the synchronization process              |
+| `server`   | Starts the API server                         |
 
 ## Configuration
 
