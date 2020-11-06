@@ -1,6 +1,6 @@
 -- +goose Up
 ALTER TABLE miners
-ADD score INTEGER;
+ADD score INTEGER NOT NULL;
 
 -- +goose Down
 ALTER TABLE miners

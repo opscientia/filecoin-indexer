@@ -61,8 +61,8 @@ Example:
 
 | Name                 | Description             | Default Value | Required |
 |----------------------|-------------------------|---------------|----------|
-| `RPC_ENDPOINT`       | Lotus RPC endpoint      | —             | **Yes**  |
-| `DATABASE_DSN`       | PostgreSQL database URL | —             | **Yes**  |
+| `RPC_ENDPOINT`       | Lotus RPC endpoint      | —             | Yes      |
+| `DATABASE_DSN`       | PostgreSQL database URL | —             | Yes      |
 | `SERVER_ADDR`        | HTTP server address     | `0.0.0.0`     | No       |
 | `SERVER_PORT`        | HTTP server port        | `8080`        | No       |
 | `DEBUG`              | Debug mode              | `false`       | No       |
@@ -89,7 +89,7 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path          | Description                    |
-|--------|---------------|--------------------------------|
-| GET    | `/miners`     | List of all storage miners     |
-| GET    | `/top_miners` | List of top 100 storage miners |
+| Method | Path                  | Description                                       |
+|--------|-----------------------|---------------------------------------------------|
+| GET    | `/miners/:height`     | List of all storage miners for a given height     |
+| GET    | `/top_miners/:height` | List of top 100 storage miners for a given height |

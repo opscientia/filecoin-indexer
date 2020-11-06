@@ -6,6 +6,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/figment-networks/filecoin-indexer/model"
 )
 
 // Store handles database operations
@@ -40,4 +42,16 @@ func (s *Store) Close() error {
 	}
 
 	return conn.Close()
+}
+
+// LastEpoch returns the most recent epoch
+func (s *Store) LastEpoch() (*model.Epoch, error) {
+	result := &model.Epoch{}
+
+	err := s.Db.Order("height DESC").Limit(1).Take(&result).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

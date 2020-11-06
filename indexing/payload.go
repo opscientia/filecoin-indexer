@@ -5,6 +5,7 @@ import (
 	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
+	"github.com/filecoin-project/lotus/chain/types"
 
 	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/indexing-engine/pipeline"
@@ -30,12 +31,17 @@ func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
 
 type payload struct {
 	currentHeight int64
+	processed     bool
 
+	// Fetcher stage
+	EpochTipset     *types.TipSet
 	MinersAddresses []address.Address
 	MinersInfo      []*miner.MinerInfo
 	MinersPower     []*api.MinerPower
 	MinersFaults    []*bitfield.BitField
 
+	// Parser stage
+	Epoch  *model.Epoch
 	Miners []*model.Miner
 }
 
@@ -47,4 +53,10 @@ func (p *payload) GetCurrentHeight() int64 {
 	return p.currentHeight
 }
 
-func (p *payload) MarkAsProcessed() {}
+func (p *payload) MarkAsProcessed() {
+	p.processed = true
+}
+
+func (p *payload) IsProcessed() bool {
+	return p.processed
+}

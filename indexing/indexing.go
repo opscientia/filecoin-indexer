@@ -13,11 +13,27 @@ import (
 func StartPipeline(client *client.Client, store *store.Store) error {
 	p := pipeline.NewDefault(NewPayloadFactory())
 
-	p.SetTasks(pipeline.StageFetcher, NewMinerFetcherTask(client))
-	p.SetTasks(pipeline.StageParser, NewMinerParserTask())
-	p.SetTasks(pipeline.StagePersistor, NewMinerPersistorTask(store))
+	p.SetTasks(pipeline.StageFetcher,
+		NewEpochFetcherTask(client),
+		NewMinerFetcherTask(client),
+	)
 
-	err := p.Start(context.Background(), NewSource(), NewSink(), &pipeline.Options{})
+	p.SetTasks(pipeline.StageParser,
+		NewEpochParserTask(),
+		NewMinerParserTask(),
+	)
+
+	p.SetTasks(pipeline.StagePersistor,
+		NewMinerPersistorTask(store),
+		NewEpochPersistorTask(store),
+	)
+
+	source, err := NewSource(client, store)
+	if err != nil {
+		return err
+	}
+
+	err = p.Start(context.Background(), source, NewSink(), &pipeline.Options{})
 	if err != nil {
 		return err
 	}

@@ -13,6 +13,7 @@ type Client struct {
 	api    *apistruct.FullNodeStruct
 	closer jsonrpc.ClientCloser
 
+	Epoch EpochClient
 	Miner MinerClient
 }
 
@@ -33,6 +34,7 @@ func New(endpoint string) (*Client, error) {
 		api:    &api,
 		closer: closer,
 
+		Epoch: NewEpochClient(&api),
 		Miner: NewMinerClient(&api),
 	}, nil
 }

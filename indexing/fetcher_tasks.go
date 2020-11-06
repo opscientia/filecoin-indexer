@@ -12,6 +12,40 @@ import (
 	"github.com/figment-networks/filecoin-indexer/client"
 )
 
+// EpochFetcherTask fetches raw epoch data
+type EpochFetcherTask struct {
+	client *client.Client
+}
+
+// NewEpochFetcherTask creates the task
+func NewEpochFetcherTask(client *client.Client) pipeline.Task {
+	return &EpochFetcherTask{client: client}
+}
+
+// GetName returns the task name
+func (t *EpochFetcherTask) GetName() string {
+	return "EpochFetcher"
+}
+
+// Run performs the task
+func (t *EpochFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
+	payload := p.(*payload)
+
+	tipset, err := t.client.Epoch.GetTipsetByHeight(payload.currentHeight)
+	if err != nil {
+		return err
+	}
+
+	if int64(tipset.Height()) == payload.currentHeight {
+		payload.EpochTipset = tipset
+	} else {
+		// Height without blocks
+		payload.MarkAsProcessed()
+	}
+
+	return nil
+}
+
 // MinerFetcherTask fetches raw miner data
 type MinerFetcherTask struct {
 	client *client.Client
@@ -31,7 +65,13 @@ func (t *MinerFetcherTask) GetName() string {
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	addresses, err := t.client.Miner.GetAddresses()
+	if payload.IsProcessed() {
+		return nil
+	}
+
+	tsk := payload.EpochTipset.Key()
+
+	addresses, err := t.client.Miner.GetAddressesByTipset(tsk)
 	if err != nil {
 		return err
 	}
@@ -56,18 +96,19 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 
 func fetchMinerData(index int, mc client.MinerClient, p *payload) error {
 	address := p.MinersAddresses[index]
+	tsk := p.EpochTipset.Key()
 
-	info, err := mc.GetInfo(address)
+	info, err := mc.GetInfoByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	power, err := mc.GetPower(address)
+	power, err := mc.GetPowerByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	faults, err := mc.GetFaults(address)
+	faults, err := mc.GetFaultsByTipset(address, tsk)
 	if err != nil {
 		return err
 	}

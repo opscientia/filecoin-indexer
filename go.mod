@@ -7,6 +7,7 @@ require (
 	github.com/filecoin-project/go-address v0.0.4
 	github.com/filecoin-project/go-bitfield v0.2.1
 	github.com/filecoin-project/go-jsonrpc v0.1.2-0.20201008195726-68c6a2704e49
+	github.com/filecoin-project/go-state-types v0.0.0-20201013222834-41ea465f274f
 	github.com/filecoin-project/lotus v1.1.2
 	github.com/gin-gonic/gin v1.6.3
 	github.com/kelseyhightower/envconfig v1.4.0

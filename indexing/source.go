@@ -4,23 +4,65 @@ import (
 	"context"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"gorm.io/gorm"
+
+	"github.com/figment-networks/filecoin-indexer/client"
+	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-// NewSource creates a pipeline source
-func NewSource() pipeline.Source {
-	return &source{}
-}
-
 type source struct {
+	startHeight   int64
+	currentHeight int64
+	endHeight     int64
+
 	err error
 }
 
-func (s *source) Next(ctx context.Context, p pipeline.Payload) bool {
-	return false
+// NewSource creates a pipeline source
+func NewSource(client *client.Client, store *store.Store) (pipeline.Source, error) {
+	startHeight, err := startHeight(store)
+	if err != nil {
+		return nil, err
+	}
+
+	endHeight, err := client.Epoch.GetCurrentHeight()
+	if err != nil {
+		return nil, err
+	}
+
+	return &source{
+		startHeight:   startHeight,
+		currentHeight: startHeight,
+		endHeight:     endHeight,
+	}, nil
+}
+
+func startHeight(store *store.Store) (int64, error) {
+	lastEpoch, err := store.LastEpoch()
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return *lastEpoch.Height + 1, nil
 }
 
 func (s *source) Current() int64 {
-	return 0
+	return s.currentHeight
+}
+
+func (s *source) Len() int64 {
+	return s.endHeight - s.startHeight + 1
+}
+
+func (s *source) Next(context.Context, pipeline.Payload) bool {
+	if s.err == nil && s.currentHeight < s.endHeight {
+		s.currentHeight++
+		return true
+	}
+	return false
 }
 
 func (s *source) Err() error {

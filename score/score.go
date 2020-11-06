@@ -2,7 +2,7 @@ package score
 
 // Variables are input parameters for the score calculation
 type Variables struct {
-	FaultsCount   uint64
+	FaultsCount   uint32
 	RelativePower float32
 	SectorSize    uint64
 }

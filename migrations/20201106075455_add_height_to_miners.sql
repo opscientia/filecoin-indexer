@@ -1,7 +1,7 @@
 -- +goose Up
 ALTER TABLE miners
-ADD sector_size BIGINT NOT NULL;
+ADD height INTEGER NOT NULL;
 
 -- +goose Down
 ALTER TABLE miners
-DROP COLUMN sector_size;
+DROP COLUMN height;
