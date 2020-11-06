@@ -21,11 +21,11 @@ func runMigrations(cfg *config.Config, cmd string) error {
 		return err
 	}
 
-	dir := "migrations"
+	dir := "store/migrations"
 
 	_, filename, _, ok := runtime.Caller(1)
 	if ok {
-		dir = path.Join(path.Dir(filename), "../migrations")
+		dir = path.Join(path.Dir(filename), "../"+dir)
 	}
 
 	switch cmd {
