@@ -12,10 +12,12 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
+var errInvalidInitialHeight = errors.New("initial height is invalid")
 var errNothingToProcess = errors.New("nothing to process")
 
 type source struct {
-	batchSize int64
+	initialHeight int64
+	batchSize     int64
 
 	startHeight   int64
 	currentHeight int64
@@ -27,7 +29,8 @@ type source struct {
 // NewSource creates a pipeline source
 func NewSource(cfg *config.Config, client *client.Client, store *store.Store) (pipeline.Source, error) {
 	source := source{
-		batchSize: cfg.BatchSize,
+		initialHeight: cfg.InitialHeight,
+		batchSize:     cfg.BatchSize,
 	}
 
 	source.setStartHeight(store)
@@ -56,6 +59,7 @@ func (s *source) Next(context.Context, pipeline.Payload) bool {
 		s.currentHeight++
 		return true
 	}
+
 	return false
 }
 
@@ -65,11 +69,13 @@ func (s *source) Err() error {
 
 func (s *source) setStartHeight(store *store.Store) {
 	lastHeight, err := store.Epoch.LastHeight()
-	if err != nil {
-		return // Keep zero values
+
+	if err == nil {
+		s.startHeight = lastHeight + 1
+	} else {
+		s.startHeight = s.initialHeight
 	}
 
-	s.startHeight = lastHeight + 1
 	s.currentHeight = s.startHeight
 }
 
@@ -90,8 +96,13 @@ func (s *source) setEndHeight(client *client.Client) error {
 }
 
 func (s *source) validate() error {
+	if s.initialHeight < 0 {
+		return errInvalidInitialHeight
+	}
+
 	if s.Len() <= 0 {
 		return errNothingToProcess
 	}
+
 	return nil
 }

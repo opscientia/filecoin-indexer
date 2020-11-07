@@ -16,12 +16,13 @@ var (
 
 // Config holds the configuration data
 type Config struct {
-	RPCEndpoint string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
-	DatabaseDSN string `json:"database_dsn" envconfig:"DATABASE_DSN"`
-	ServerAddr  string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
-	ServerPort  int64  `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
-	BatchSize   int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
-	Debug       bool   `json:"debug" envconfig:"DEBUG"`
+	RPCEndpoint   string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
+	DatabaseDSN   string `json:"database_dsn" envconfig:"DATABASE_DSN"`
+	ServerAddr    string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
+	ServerPort    uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
+	InitialHeight int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
+	BatchSize     int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
+	Debug         bool   `json:"debug" envconfig:"DEBUG"`
 }
 
 // New creates a new configuration
@@ -40,6 +41,7 @@ func FromFile(path string, config *Config) error {
 	if err != nil {
 		return err
 	}
+
 	return json.Unmarshal(data, config)
 }
 
