@@ -77,7 +77,7 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	for i := range addresses {
 		func(index int) {
 			eg.Go(func() error {
-				return fetchMinerData(index, t.client.Miner, payload)
+				return fetchMinerData(index, t.client, payload)
 			})
 		}(i)
 	}
@@ -85,21 +85,21 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	return eg.Wait()
 }
 
-func fetchMinerData(index int, mc client.MinerClient, p *payload) error {
+func fetchMinerData(index int, c *client.Client, p *payload) error {
 	address := p.MinersAddresses[index]
 	tsk := p.EpochTipset.Key()
 
-	info, err := mc.GetInfoByTipset(address, tsk)
+	info, err := c.Miner.GetInfoByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	power, err := mc.GetPowerByTipset(address, tsk)
+	power, err := c.Miner.GetPowerByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	faults, err := mc.GetFaultsByTipset(address, tsk)
+	faults, err := c.Miner.GetFaultsByTipset(address, tsk)
 	if err != nil {
 		return err
 	}

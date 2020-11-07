@@ -6,13 +6,12 @@ import (
 	"github.com/figment-networks/filecoin-indexer/model"
 )
 
-// MinerStore handles database operations on miners
-type MinerStore struct {
+type minerStore struct {
 	db *gorm.DB
 }
 
 // CreateOrUpdate stores or updates a miner record
-func (ms *MinerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
+func (ms *minerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
 	result := model.Miner{}
 
 	err := ms.db.
@@ -39,7 +38,7 @@ func (ms *MinerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
 }
 
 // FindAllByHeight retrieves all miners for a given height
-func (ms *MinerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
+func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 	var miners []model.Miner
 
 	err := ms.db.Where("height = ?", height).Find(&miners).Error
@@ -51,7 +50,7 @@ func (ms *MinerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 }
 
 // FindTop100ByHeight retrieves top 100 miners for a given height
-func (ms *MinerStore) FindTop100ByHeight(height int64) (*[]model.Miner, error) {
+func (ms *minerStore) FindTop100ByHeight(height int64) (*[]model.Miner, error) {
 	var miners []model.Miner
 
 	err := ms.db.Where("height = ?", height).Order("score DESC").Limit(100).Find(&miners).Error

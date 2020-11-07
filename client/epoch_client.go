@@ -8,23 +8,8 @@ import (
 	"github.com/filecoin-project/lotus/chain/types"
 )
 
-// EpochClient fetches epoch information
-type EpochClient interface {
-	GetCurrentHeight() (int64, error)
-	GetTipsetByHeight(int64) (*types.TipSet, error)
-}
-
 type epochClient struct {
 	api *apistruct.FullNodeStruct
-}
-
-var (
-	_ EpochClient = (*epochClient)(nil)
-)
-
-// NewEpochClient creates an epoch client
-func NewEpochClient(api *apistruct.FullNodeStruct) EpochClient {
-	return &epochClient{api: api}
 }
 
 // GetCurrentHeight fetches the height of the current epoch

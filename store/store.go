@@ -12,8 +12,8 @@ import (
 type Store struct {
 	db *gorm.DB
 
-	Epoch EpochStore
-	Miner MinerStore
+	Epoch epochStore
+	Miner minerStore
 }
 
 // New creates a store from the connection string
@@ -30,8 +30,8 @@ func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 	return &Store{
 		db: db,
 
-		Epoch: EpochStore{db: db},
-		Miner: MinerStore{db: db},
+		Epoch: epochStore{db: db},
+		Miner: minerStore{db: db},
 	}, nil
 }
 
