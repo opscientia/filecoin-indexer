@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
-	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/store"
@@ -20,10 +19,7 @@ type source struct {
 
 // NewSource creates a pipeline source
 func NewSource(client *client.Client, store *store.Store) (pipeline.Source, error) {
-	startHeight, err := startHeight(store)
-	if err != nil {
-		return nil, err
-	}
+	startHeight := startHeight(store)
 
 	endHeight, err := client.Epoch.GetCurrentHeight()
 	if err != nil {
@@ -37,16 +33,13 @@ func NewSource(client *client.Client, store *store.Store) (pipeline.Source, erro
 	}, nil
 }
 
-func startHeight(store *store.Store) (int64, error) {
-	lastEpoch, err := store.LastEpoch()
+func startHeight(store *store.Store) int64 {
+	lastHeight, err := store.LastHeight()
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return 0, nil
-		}
-		return 0, err
+		return 0
 	}
 
-	return *lastEpoch.Height + 1, nil
+	return lastHeight + 1
 }
 
 func (s *source) Current() int64 {

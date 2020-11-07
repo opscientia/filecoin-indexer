@@ -44,7 +44,7 @@ Available commands:
 
 You can configure the indexer using a config file or environment variables.
 
-### Config File
+### Config file
 
 Example:
 
@@ -57,7 +57,7 @@ Example:
 }
 ```
 
-### Environment Variables
+### Environment variables
 
 | Name                 | Description             | Default Value | Required |
 |----------------------|-------------------------|---------------|----------|
@@ -89,7 +89,7 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path                  | Description                                       |
-|--------|-----------------------|---------------------------------------------------|
-| GET    | `/miners/:height`     | List of all storage miners for a given height     |
-| GET    | `/top_miners/:height` | List of top 100 storage miners for a given height |
+| Method | Path          | Description                    | Parameters          |
+|--------|---------------|--------------------------------|---------------------|
+| GET    | `/miners`     | List of all storage miners     | `height` (optional) |
+| GET    | `/top_miners` | List of top 100 storage miners | `height` (optional) |
