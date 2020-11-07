@@ -25,10 +25,13 @@ func (t *EpochParserTask) GetName() string {
 // Run performs the task
 func (t *EpochParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
+	epochHeight := int64(payload.EpochTipset.Height())
 
 	var blocksCount uint16
-	if payload.EpochTipset != nil {
+	if epochHeight == payload.currentHeight {
 		blocksCount = uint16(len(payload.EpochTipset.Blocks()))
+	} else {
+		blocksCount = 0 // Null-block height
 	}
 
 	payload.Epoch = &model.Epoch{
@@ -55,10 +58,6 @@ func (t *MinerParserTask) GetName() string {
 // Run performs the task
 func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
-
-	if payload.IsProcessed() {
-		return nil
-	}
 
 	for i, address := range payload.MinersAddresses {
 		sectorSize := uint64(payload.MinersInfo[i].SectorSize)

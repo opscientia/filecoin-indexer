@@ -36,12 +36,7 @@ func (t *EpochFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 		return err
 	}
 
-	if int64(tipset.Height()) == payload.currentHeight {
-		payload.EpochTipset = tipset
-	} else {
-		// Height without blocks
-		payload.MarkAsProcessed()
-	}
+	payload.EpochTipset = tipset
 
 	return nil
 }
@@ -64,10 +59,6 @@ func (t *MinerFetcherTask) GetName() string {
 // Run performs the task
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
-
-	if payload.IsProcessed() {
-		return nil
-	}
 
 	tsk := payload.EpochTipset.Key()
 

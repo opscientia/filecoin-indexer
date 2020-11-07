@@ -52,10 +52,6 @@ func (t *MinerPersistorTask) GetName() string {
 func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	if payload.IsProcessed() {
-		return nil
-	}
-
 	for _, miner := range payload.Miners {
 		m := model.Miner{}
 
