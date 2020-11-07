@@ -6,11 +6,12 @@ import (
 	"github.com/figment-networks/indexing-engine/pipeline"
 
 	"github.com/figment-networks/filecoin-indexer/client"
+	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
 // StartPipeline runs the indexing pipeline
-func StartPipeline(client *client.Client, store *store.Store) error {
+func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store) error {
 	p := pipeline.NewDefault(NewPayloadFactory())
 
 	p.SetTasks(pipeline.StageFetcher,
@@ -28,7 +29,7 @@ func StartPipeline(client *client.Client, store *store.Store) error {
 		NewEpochPersistorTask(store),
 	)
 
-	source, err := NewSource(client, store)
+	source, err := NewSource(cfg, client, store)
 	if err != nil {
 		return err
 	}

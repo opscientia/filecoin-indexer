@@ -27,8 +27,7 @@ func (t *EpochPersistorTask) GetName() string {
 func (t *EpochPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	err := t.store.Epoch.Create(payload.Epoch)
-	if err != nil {
+	if err := t.store.Epoch.Create(payload.Epoch); err != nil {
 		return err
 	}
 

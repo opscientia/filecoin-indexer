@@ -2,14 +2,21 @@ package indexing
 
 import (
 	"context"
+	"errors"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/pkg/math"
 
 	"github.com/figment-networks/filecoin-indexer/client"
+	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
+var errNothingToProcess = errors.New("nothing to process")
+
 type source struct {
+	batchSize int64
+
 	startHeight   int64
 	currentHeight int64
 	endHeight     int64
@@ -18,28 +25,22 @@ type source struct {
 }
 
 // NewSource creates a pipeline source
-func NewSource(client *client.Client, store *store.Store) (pipeline.Source, error) {
-	startHeight := startHeight(store)
+func NewSource(cfg *config.Config, client *client.Client, store *store.Store) (pipeline.Source, error) {
+	source := source{
+		batchSize: cfg.BatchSize,
+	}
 
-	endHeight, err := client.Epoch.GetCurrentHeight()
-	if err != nil {
+	source.setStartHeight(store)
+
+	if err := source.setEndHeight(client); err != nil {
 		return nil, err
 	}
 
-	return &source{
-		startHeight:   startHeight,
-		currentHeight: startHeight,
-		endHeight:     endHeight,
-	}, nil
-}
-
-func startHeight(store *store.Store) int64 {
-	lastHeight, err := store.Epoch.LastHeight()
-	if err != nil {
-		return 0
+	if err := source.validate(); err != nil {
+		return nil, err
 	}
 
-	return lastHeight + 1
+	return &source, nil
 }
 
 func (s *source) Current() int64 {
@@ -60,4 +61,37 @@ func (s *source) Next(context.Context, pipeline.Payload) bool {
 
 func (s *source) Err() error {
 	return s.err
+}
+
+func (s *source) setStartHeight(store *store.Store) {
+	lastHeight, err := store.Epoch.LastHeight()
+	if err != nil {
+		return // Keep zero values
+	}
+
+	s.startHeight = lastHeight + 1
+	s.currentHeight = s.startHeight
+}
+
+func (s *source) setEndHeight(client *client.Client) error {
+	currentHeight, err := client.Epoch.GetCurrentHeight()
+	if err != nil {
+		return err
+	}
+
+	if s.batchSize > 0 {
+		batchEnd := s.startHeight + s.batchSize - 1
+		s.endHeight = math.MinInt64(batchEnd, currentHeight)
+	} else {
+		s.endHeight = currentHeight
+	}
+
+	return nil
+}
+
+func (s *source) validate() error {
+	if s.Len() <= 0 {
+		return errNothingToProcess
+	}
+	return nil
 }

@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	errEndpointRequired = errors.New("Filecoin RPC endpoint is required")
-	errDatabaseRequired = errors.New("Database credentials are required")
+	errEndpointRequired = errors.New("RPC endpoint is required")
+	errDatabaseRequired = errors.New("database credentials are required")
 )
 
 // Config holds the configuration data
@@ -20,6 +20,7 @@ type Config struct {
 	DatabaseDSN string `json:"database_dsn" envconfig:"DATABASE_DSN"`
 	ServerAddr  string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
 	ServerPort  int64  `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
+	BatchSize   int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
 	Debug       bool   `json:"debug" envconfig:"DEBUG"`
 }
 

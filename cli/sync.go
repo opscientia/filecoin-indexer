@@ -18,5 +18,5 @@ func runSync(cfg *config.Config) error {
 	}
 	defer store.Close()
 
-	return indexing.StartPipeline(client, store)
+	return indexing.StartPipeline(cfg, client, store)
 }

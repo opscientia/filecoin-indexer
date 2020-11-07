@@ -53,19 +53,21 @@ Example:
   "rpc_endpoint": "5.6.7.8:1234",
   "database_dsn": "dbname=filecoin-indexer",
   "server_addr": "localhost",
+  "batch_size": 100,
   "debug": true
 }
 ```
 
 ### Environment variables
 
-| Name                 | Description             | Default Value | Required |
-|----------------------|-------------------------|---------------|----------|
-| `RPC_ENDPOINT`       | Lotus RPC endpoint      | —             | Yes      |
-| `DATABASE_DSN`       | PostgreSQL database URL | —             | Yes      |
-| `SERVER_ADDR`        | HTTP server address     | `0.0.0.0`     | No       |
-| `SERVER_PORT`        | HTTP server port        | `8080`        | No       |
-| `DEBUG`              | Debug mode              | `false`       | No       |
+| Name                 | Description               | Default Value | Required |
+|----------------------|---------------------------|---------------|----------|
+| `RPC_ENDPOINT`       | Lotus RPC endpoint        | —             | Yes      |
+| `DATABASE_DSN`       | PostgreSQL database URL   | —             | Yes      |
+| `SERVER_ADDR`        | HTTP server address       | `0.0.0.0`     | No       |
+| `SERVER_PORT`        | HTTP server port          | `8080`        | No       |
+| `BATCH_SIZE`         | Limit of heights per sync | —             | No       |
+| `DEBUG`              | Debug mode                | `false`       | No       |
 
 ## Running Application
 

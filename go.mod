@@ -11,6 +11,7 @@ require (
 	github.com/filecoin-project/lotus v1.1.2
 	github.com/gin-gonic/gin v1.6.3
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/pressly/goose v2.6.0+incompatible
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	gorm.io/driver/postgres v1.0.5

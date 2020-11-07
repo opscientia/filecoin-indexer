@@ -53,7 +53,13 @@ func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 func (ms *minerStore) FindTop100ByHeight(height int64) (*[]model.Miner, error) {
 	var miners []model.Miner
 
-	err := ms.db.Where("height = ?", height).Order("score DESC").Limit(100).Find(&miners).Error
+	err := ms.db.
+		Where("height = ?", height).
+		Order("score DESC").
+		Limit(100).
+		Find(&miners).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
