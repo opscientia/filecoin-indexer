@@ -95,3 +95,21 @@ $ filecoin-indexer -config config.json -cmd=server
 |--------|---------------|--------------------------------|---------------------|
 | GET    | `/miners`     | List of all storage miners     | `height` (optional) |
 | GET    | `/top_miners` | List of top 100 storage miners | `height` (optional) |
+
+## Score Calculation
+
+The reputation of storage miners is calculated with the following formula:
+
+<img src="https://latex.codecogs.com/svg.latex?\LARGE%20S_{\mathcal{M}_i}%20=%20\sum_j%20v_{j_{\mathcal{M}_i}}%20w_{v_j}" title="\LARGE S_{\mathcal{M}_i} = \sum_j v_{j_{\mathcal{M}_i}} w_{v_j}">
+
+Where:
+
+<img src="https://latex.codecogs.com/svg.latex?\\%20S_{\mathcal{M}_i}%20-%20\textrm{reputation%20score%20of%20a%20miner%20$\mathcal{M}_i$}%20\\%20\\%20v_{j_{\mathcal{M}_i}}%20-%20\textrm{variable%20$v_j$%20calculated%20for%20the%20miner%20$\mathcal{M}_i$}%20\\%20w_{v_j}%20-%20\textrm{weight%20of%20the%20variable%20$v_j$}" title="\\ S_{\mathcal{M}_i} - \textrm{reputation score of a miner $\mathcal{M}_i$} \\ \\ v_{j_{\mathcal{M}_i}} - \textrm{variable $v_j$ calculated for the miner $\mathcal{M}_i$} \\ w_{v_j} - \textrm{weight of the variable $v_j$}">
+
+### Variables
+
+| Name        | Weight | Description                                             |
+|-------------|--------|---------------------------------------------------------|
+| Faults      | 100    | Reciprocal of the total number of miner's faults        |
+| Power       | 100    | Miner's quality-adjusted power divided by network power |
+| Sector Size | 10     | Miner's sector size divided by 32 GiB                   |
