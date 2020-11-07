@@ -1,12 +1,11 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
@@ -14,34 +13,28 @@ import (
 func Run(listenAddr string, store *store.Store) error {
 	router := gin.Default()
 
-	router.GET("/miners", func(ctx *gin.Context) {
-		height := ctx.DefaultQuery("height", lastHeight(store))
+	router.GET("/miners", func(c *gin.Context) {
+		height := getHeight(c, store)
+		miners, _ := store.Miner.FindAllByHeight(height)
 
-		var miners []model.Miner
-
-		store.Db.Where("height = ?", height).Find(&miners)
-
-		ctx.JSON(http.StatusOK, miners)
+		c.JSON(http.StatusOK, miners)
 	})
 
-	router.GET("/top_miners", func(ctx *gin.Context) {
-		height := ctx.DefaultQuery("height", lastHeight(store))
+	router.GET("/top_miners", func(c *gin.Context) {
+		height := getHeight(c, store)
+		miners, _ := store.Miner.FindTop100ByHeight(height)
 
-		var miners []model.Miner
-
-		store.Db.
-			Where("height = ?", height).
-			Order("score DESC").
-			Limit(100).
-			Find(&miners)
-
-		ctx.JSON(http.StatusOK, miners)
+		c.JSON(http.StatusOK, miners)
 	})
 
 	return router.Run(listenAddr)
 }
 
-func lastHeight(store *store.Store) string {
-	result, _ := store.LastHeight()
-	return fmt.Sprintf("%d", result)
+func getHeight(c *gin.Context, store *store.Store) int64 {
+	height, err := strconv.ParseInt(c.Query("height"), 10, 64)
+	if err != nil {
+		height, _ = store.Epoch.LastHeight()
+	}
+
+	return height
 }

@@ -10,7 +10,10 @@ import (
 
 // Store handles database operations
 type Store struct {
-	Db *gorm.DB
+	db *gorm.DB
+
+	Epoch EpochStore
+	Miner MinerStore
 }
 
 // New creates a store from the connection string
@@ -24,12 +27,17 @@ func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 		return nil, err
 	}
 
-	return &Store{Db: db}, nil
+	return &Store{
+		db: db,
+
+		Epoch: EpochStore{db: db},
+		Miner: MinerStore{db: db},
+	}, nil
 }
 
 // Conn returns the underlying database connection
 func (s *Store) Conn() (*sql.DB, error) {
-	return s.Db.DB()
+	return s.db.DB()
 }
 
 // Close closes the database connection
@@ -40,16 +48,4 @@ func (s *Store) Close() error {
 	}
 
 	return conn.Close()
-}
-
-// LastHeight returns the most recent height
-func (s *Store) LastHeight() (int64, error) {
-	var result int64
-
-	err := s.Db.Table("epochs").Select("MAX(height)").Scan(&result).Error
-	if err != nil {
-		return 0, err
-	}
-
-	return result, nil
 }

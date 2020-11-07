@@ -34,7 +34,7 @@ func NewSource(client *client.Client, store *store.Store) (pipeline.Source, erro
 }
 
 func startHeight(store *store.Store) int64 {
-	lastHeight, err := store.LastHeight()
+	lastHeight, err := store.Epoch.LastHeight()
 	if err != nil {
 		return 0
 	}

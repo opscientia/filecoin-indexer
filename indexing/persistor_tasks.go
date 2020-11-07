@@ -5,7 +5,6 @@ import (
 
 	"github.com/figment-networks/indexing-engine/pipeline"
 
-	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
@@ -28,7 +27,10 @@ func (t *EpochPersistorTask) GetName() string {
 func (t *EpochPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	t.store.Db.Create(payload.Epoch)
+	err := t.store.Epoch.Create(payload.Epoch)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -53,22 +55,10 @@ func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error 
 	payload := p.(*payload)
 
 	for _, miner := range payload.Miners {
-		m := model.Miner{}
-
-		t.store.Db.
-			Where(model.Miner{
-				Height:  miner.Height,
-				Address: miner.Address,
-			}).
-			Assign(model.Miner{
-				SectorSize:      miner.SectorSize,
-				RawBytePower:    miner.RawBytePower,
-				QualityAdjPower: miner.QualityAdjPower,
-				RelativePower:   miner.RelativePower,
-				FaultsCount:     miner.FaultsCount,
-				Score:           miner.Score,
-			}).
-			FirstOrCreate(&m)
+		_, err := t.store.Miner.CreateOrUpdate(miner)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
