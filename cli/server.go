@@ -18,5 +18,5 @@ func runServer(cfg *config.Config) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	return server.Run(cfg.ListenAddr(), store)
+	return server.New(store).Start(cfg.ListenAddr())
 }
