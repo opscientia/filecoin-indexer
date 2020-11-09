@@ -72,21 +72,39 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		}
 		faultsCount := uint32(fc)
 
+		var dealsCount uint32
+		var slashedDealsCount uint32
+
+		for _, deal := range payload.MarketDeals {
+			if deal.Proposal.Provider == address {
+				if deal.State.SectorStartEpoch != -1 {
+					dealsCount++
+
+					if deal.State.SlashEpoch != -1 {
+						slashedDealsCount++
+					}
+				}
+			}
+		}
+
 		score := score.CalculateScore(score.Variables{
-			SectorSize:    sectorSize,
-			RelativePower: relativePower,
-			FaultsCount:   faultsCount,
+			SectorSize:        sectorSize,
+			RelativePower:     relativePower,
+			FaultsCount:       faultsCount,
+			SlashedDealsCount: slashedDealsCount,
 		})
 
 		miner := model.Miner{
-			Height:          &payload.currentHeight,
-			Address:         address.String(),
-			SectorSize:      &sectorSize,
-			RawBytePower:    &rawBytePower,
-			QualityAdjPower: &qualityAdjPower,
-			RelativePower:   &relativePower,
-			FaultsCount:     &faultsCount,
-			Score:           &score,
+			Height:            &payload.currentHeight,
+			Address:           address.String(),
+			SectorSize:        &sectorSize,
+			RawBytePower:      &rawBytePower,
+			QualityAdjPower:   &qualityAdjPower,
+			RelativePower:     &relativePower,
+			FaultsCount:       &faultsCount,
+			DealsCount:        &dealsCount,
+			SlashedDealsCount: &slashedDealsCount,
+			Score:             &score,
 		}
 
 		payload.Miners = append(payload.Miners, &miner)

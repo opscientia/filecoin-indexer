@@ -59,8 +59,13 @@ func (t *MinerFetcherTask) GetName() string {
 // Run performs the task
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
-
 	tsk := payload.EpochTipset.Key()
+
+	deals, err := t.client.Miner.GetMarketDeals(tsk)
+	if err != nil {
+		return err
+	}
+	payload.MarketDeals = deals
 
 	addresses, err := t.client.Miner.GetAddressesByTipset(tsk)
 	if err != nil {

@@ -20,12 +20,14 @@ func (ms *minerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
 			Address: miner.Address,
 		}).
 		Assign(model.Miner{
-			SectorSize:      miner.SectorSize,
-			RawBytePower:    miner.RawBytePower,
-			QualityAdjPower: miner.QualityAdjPower,
-			RelativePower:   miner.RelativePower,
-			FaultsCount:     miner.FaultsCount,
-			Score:           miner.Score,
+			SectorSize:        miner.SectorSize,
+			RawBytePower:      miner.RawBytePower,
+			QualityAdjPower:   miner.QualityAdjPower,
+			RelativePower:     miner.RelativePower,
+			FaultsCount:       miner.FaultsCount,
+			DealsCount:        miner.DealsCount,
+			SlashedDealsCount: miner.SlashedDealsCount,
+			Score:             miner.Score,
 		}).
 		FirstOrCreate(&result).
 		Error
