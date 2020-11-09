@@ -1,9 +1,6 @@
 package cli
 
 import (
-	"path"
-	"runtime"
-
 	"github.com/pressly/goose"
 
 	"github.com/figment-networks/filecoin-indexer/config"
@@ -21,18 +18,11 @@ func runMigrations(cfg *config.Config, cmd string) error {
 		return err
 	}
 
-	dir := "store/migrations"
-
-	_, filename, _, ok := runtime.Caller(1)
-	if ok {
-		dir = path.Join(path.Dir(filename), "../"+dir)
-	}
-
 	switch cmd {
 	case "migrate":
-		return goose.Up(conn, dir)
+		return goose.Up(conn, "migrations")
 	case "rollback":
-		return goose.Down(conn, dir)
+		return goose.Down(conn, "migrations")
 	default:
 		return nil
 	}
