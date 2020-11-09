@@ -103,11 +103,11 @@ $ filecoin-indexer -config config.json -cmd=server
 
 The reputation of storage miners is calculated with the following formula:
 
-<img src="https://latex.codecogs.com/svg.latex?\LARGE%20S_{\mathcal{M}_i}%20=%20\sum_j%20v_{j_{\mathcal{M}_i}}%20w_{v_j}" title="\LARGE S_{\mathcal{M}_i} = \sum_j v_{j_{\mathcal{M}_i}} w_{v_j}">
+![Score formula](assets/score-formula.svg)
 
 Where:
 
-<img src="https://latex.codecogs.com/svg.latex?\\%20S_{\mathcal{M}_i}%20-%20\textrm{reputation%20score%20of%20a%20miner%20$\mathcal{M}_i$}%20\\%20\\%20v_{j_{\mathcal{M}_i}}%20-%20\textrm{variable%20$v_j$%20calculated%20for%20the%20miner%20$\mathcal{M}_i$}%20\\%20w_{v_j}%20-%20\textrm{weight%20of%20the%20variable%20$v_j$}" title="\\ S_{\mathcal{M}_i} - \textrm{reputation score of a miner $\mathcal{M}_i$} \\ \\ v_{j_{\mathcal{M}_i}} - \textrm{variable $v_j$ calculated for the miner $\mathcal{M}_i$} \\ w_{v_j} - \textrm{weight of the variable $v_j$}">
+![Symbol description](assets/symbol-description.svg)
 
 ### Variables
 
