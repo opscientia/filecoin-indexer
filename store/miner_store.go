@@ -39,6 +39,22 @@ func (ms *minerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
 	return &result, nil
 }
 
+// FindByHeight retrieves a miner record for a given height
+func (ms *minerStore) FindByHeight(address string, height int64) (*model.Miner, error) {
+	var miner model.Miner
+
+	err := ms.db.
+		Where("address = ? AND height = ?", address, height).
+		Take(&miner).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &miner, nil
+}
+
 // FindAllByHeight retrieves all miners for a given height
 func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 	var miners []model.Miner

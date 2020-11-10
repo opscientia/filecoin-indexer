@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/store"
 )
@@ -15,6 +16,20 @@ func (s *Server) GetMiners(c *gin.Context) {
 	miners, _ := s.store.Miner.FindAllByHeight(height)
 
 	c.JSON(http.StatusOK, miners)
+}
+
+// GetMiner returns storage miner details
+func (s *Server) GetMiner(c *gin.Context) {
+	address := c.Param("address")
+	height := getHeight(c, s.store)
+
+	miner, err := s.store.Miner.FindByHeight(address, height)
+	if err == gorm.ErrRecordNotFound {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, miner)
 }
 
 // GetTopMiners lists top 100 storage miners
