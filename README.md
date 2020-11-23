@@ -118,3 +118,8 @@ Where:
 | Faults      | 100    | Reciprocal of the total number of miner's faults                 |
 | Power       | 100    | Miner's quality-adjusted power divided by network power          |
 | Sector Size | 10     | Miner's sector size divided by 32 GiB                            |
+
+## License
+
+- MIT License
+- Apache License 2.0
