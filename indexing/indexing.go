@@ -17,15 +17,18 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 	p.SetTasks(pipeline.StageFetcher,
 		NewEpochFetcherTask(client),
 		NewMinerFetcherTask(client),
+		NewTransactionFetcherTask(client),
 	)
 
 	p.SetTasks(pipeline.StageParser,
 		NewEpochParserTask(),
 		NewMinerParserTask(),
+		NewTransactionParserTask(),
 	)
 
 	p.SetTasks(pipeline.StagePersistor,
 		NewMinerPersistorTask(store),
+		NewTransactionPersistorTask(store),
 		NewEpochPersistorTask(store),
 	)
 

@@ -13,8 +13,9 @@ type Client struct {
 	api    *apistruct.FullNodeStruct
 	closer jsonrpc.ClientCloser
 
-	Epoch epochClient
-	Miner minerClient
+	Epoch       epochClient
+	Miner       minerClient
+	Transaction transactionClient
 }
 
 // New creates a Filecoin client
@@ -34,8 +35,9 @@ func New(endpoint string) (*Client, error) {
 		api:    &api,
 		closer: closer,
 
-		Epoch: epochClient{api: &api},
-		Miner: minerClient{api: &api},
+		Epoch:       epochClient{api: &api},
+		Miner:       minerClient{api: &api},
+		Transaction: transactionClient{api: &api},
 	}, nil
 }
 

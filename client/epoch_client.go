@@ -24,5 +24,8 @@ func (ec *epochClient) GetCurrentHeight() (int64, error) {
 
 // GetTipsetByHeight fetches a tipset for a given height
 func (ec *epochClient) GetTipsetByHeight(height int64) (*types.TipSet, error) {
-	return ec.api.ChainGetTipSetByHeight(context.Background(), abi.ChainEpoch(height), types.EmptyTSK)
+	ctx := context.Background()
+	epoch := abi.ChainEpoch(height)
+
+	return ec.api.ChainGetTipSetByHeight(ctx, epoch, types.EmptyTSK)
 }

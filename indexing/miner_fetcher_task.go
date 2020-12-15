@@ -36,7 +36,7 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	if err != nil {
 		return err
 	}
-	payload.MarketDeals = deals
+	payload.MinersDeals = deals
 
 	addresses, err := t.client.Miner.GetAddressesByTipset(tsk)
 	if err != nil {
