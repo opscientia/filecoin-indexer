@@ -23,3 +23,32 @@ func (ts *transactionStore) FindOrCreate(transaction *model.Transaction) error {
 
 	return nil
 }
+
+// FindAll retrieves all transactions
+func (ts *transactionStore) FindAll() (*[]model.Transaction, error) {
+	transactions := []model.Transaction{}
+
+	err := ts.db.Order("height DESC").Find(&transactions).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &transactions, nil
+}
+
+// FindAllByAddress retrieves all transactions for a given address
+func (ts *transactionStore) FindAllByAddress(address string) (*[]model.Transaction, error) {
+	transactions := []model.Transaction{}
+
+	err := ts.db.
+		Where(`"from" = ? OR "to" = ?`, address, address).
+		Order("height DESC").
+		Find(&transactions).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &transactions, nil
+}

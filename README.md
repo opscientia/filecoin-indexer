@@ -94,11 +94,12 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path               | Description                    | Parameters          |
-|--------|--------------------|--------------------------------|---------------------|
-| GET    | `/miners`          | List of all storage miners     | `height` (optional) |
-| GET    | `/miners/:address` | Storage miner details          | `height` (optional) |
-| GET    | `/top_miners`      | List of top 100 storage miners | `height` (optional) |
+| Method | Path               | Description                    | Parameters           |
+|--------|--------------------|--------------------------------|----------------------|
+| GET    | `/miners`          | List of all storage miners     | `height` (optional)  |
+| GET    | `/miners/:address` | Storage miner details          | `height` (optional)  |
+| GET    | `/top_miners`      | List of top 100 storage miners | `height` (optional)  |
+| GET    | `/transactions`    | List of all transactions       | `address` (optional) |
 
 ## Score Calculation
 
@@ -112,12 +113,12 @@ Where:
 
 ### Variables
 
-| Name        | Weight | Description                                                      |
-|-------------|--------|------------------------------------------------------------------|
-| Slashings   | 100    | Reciprocal of the number of miner's deals that have been slashed |
-| Faults      | 100    | Reciprocal of the total number of miner's faults                 |
-| Power       | 100    | Miner's quality-adjusted power divided by network power          |
-| Sector Size | 10     | Miner's sector size divided by 32 GiB                            |
+| Name        | Description                                                      | Weight |
+|-------------|------------------------------------------------------------------|--------|
+| Slashings   | Reciprocal of the number of miner's deals that have been slashed | 100    |
+| Faults      | Reciprocal of the total number of miner's faults                 | 100    |
+| Power       | Miner's quality-adjusted power divided by network power          | 100    |
+| Sector Size | Miner's sector size divided by 32 GiB                            | 10     |
 
 ## License
 

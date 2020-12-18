@@ -28,6 +28,7 @@ func (s *Server) setRoutes() {
 	s.engine.GET("/miners", s.GetMiners)
 	s.engine.GET("/miners/:address", s.GetMiner)
 	s.engine.GET("/top_miners", s.GetTopMiners)
+	s.engine.GET("/transactions", s.GetTransactions)
 }
 
 // Start runs the server
