@@ -10,7 +10,16 @@ type transactionStore struct {
 	db *gorm.DB
 }
 
-// Create stores a transaction record
-func (ts *transactionStore) Create(transaction *model.Transaction) error {
-	return ts.db.Create(transaction).Error
+// FindOrCreate retrieves or stores a transaction record
+func (ts *transactionStore) FindOrCreate(transaction *model.Transaction) error {
+	err := ts.db.
+		Where(model.Transaction{CID: transaction.CID}).
+		FirstOrCreate(transaction).
+		Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

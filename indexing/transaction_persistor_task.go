@@ -28,7 +28,7 @@ func (t *TransactionPersistorTask) Run(ctx context.Context, p pipeline.Payload) 
 	payload := p.(*payload)
 
 	for _, transaction := range payload.Transactions {
-		err := t.store.Transaction.Create(transaction)
+		err := t.store.Transaction.FindOrCreate(transaction)
 		if err != nil {
 			return err
 		}
