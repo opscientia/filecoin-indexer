@@ -94,12 +94,14 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path               | Description                    | Parameters           |
-|--------|--------------------|--------------------------------|----------------------|
-| GET    | `/miners`          | List of all storage miners     | `height` (optional)  |
-| GET    | `/miners/:address` | Storage miner details          | `height` (optional)  |
-| GET    | `/top_miners`      | List of top 100 storage miners | `height` (optional)  |
-| GET    | `/transactions`    | List of all transactions       | `address` (optional) |
+| Method | Path                              | Description                    | Parameters           |
+|--------|-----------------------------------|--------------------------------|----------------------|
+| GET    | `/miners`                         | List of all storage miners     | `height` (optional)  |
+| GET    | `/miners/:address`                | Storage miner details          | `height` (optional)  |
+| GET    | `/top_miners`                     | List of top 100 storage miners | `height` (optional)  |
+| GET    | `/transactions`                   | List of all transactions       | `address` (optional) |
+| GET    | `/accounts/:address`              | Account details                | —                    |
+| GET    | `/accounts/:address/transactions` | List of account's transactions | —                    |
 
 ## Score Calculation
 

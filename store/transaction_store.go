@@ -36,12 +36,12 @@ func (ts *transactionStore) FindAll() (*[]model.Transaction, error) {
 	return &transactions, nil
 }
 
-// FindAllByAddress retrieves all transactions for a given address
-func (ts *transactionStore) FindAllByAddress(address string) (*[]model.Transaction, error) {
+// FindAllByAddress retrieves all transactions for given addresses
+func (ts *transactionStore) FindAllByAddress(addresses ...string) (*[]model.Transaction, error) {
 	transactions := []model.Transaction{}
 
 	err := ts.db.
-		Where(`"from" = ? OR "to" = ?`, address, address).
+		Where(`"from" IN ? OR "to" IN ?`, addresses, addresses).
 		Order("height DESC").
 		Find(&transactions).
 		Error

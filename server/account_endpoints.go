@@ -40,3 +40,21 @@ func (s *Server) GetAccount(c *gin.Context) {
 
 	c.JSON(http.StatusOK, account)
 }
+
+// GetAccountTransactions returns account transactions
+func (s *Server) GetAccountTransactions(c *gin.Context) {
+	var transactions *[]model.Transaction
+
+	addr, err := address.NewFromString(c.Param("address"))
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	id := s.client.Account.GetIDAddress(addr)
+	pubkey := s.client.Account.GetPublicKeyAddress(addr)
+
+	transactions, _ = s.store.Transaction.FindAllByAddress(id, pubkey)
+
+	c.JSON(http.StatusOK, transactions)
+}
