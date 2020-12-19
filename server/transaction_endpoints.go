@@ -12,10 +12,10 @@ import (
 func (s *Server) GetTransactions(c *gin.Context) {
 	var transactions *[]model.Transaction
 
-	address := c.Query("address")
+	height := c.Query("height")
 
-	if address != "" {
-		transactions, _ = s.store.Transaction.FindAllByAddress(address)
+	if height != "" {
+		transactions, _ = s.store.Transaction.FindAllByHeight(height)
 	} else {
 		transactions, _ = s.store.Transaction.FindAll()
 	}
