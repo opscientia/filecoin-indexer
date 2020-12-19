@@ -16,6 +16,7 @@ type Client struct {
 	Epoch       epochClient
 	Miner       minerClient
 	Transaction transactionClient
+	Account     accountClient
 }
 
 // New creates a Filecoin client
@@ -38,6 +39,7 @@ func New(endpoint string) (*Client, error) {
 		Epoch:       epochClient{api: &api},
 		Miner:       minerClient{api: &api},
 		Transaction: transactionClient{api: &api},
+		Account:     accountClient{api: &api},
 	}, nil
 }
 

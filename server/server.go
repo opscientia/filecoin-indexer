@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
@@ -10,13 +11,15 @@ import (
 type Server struct {
 	engine *gin.Engine
 	store  *store.Store
+	client *client.Client
 }
 
 // New creates an HTTP server
-func New(store *store.Store) *Server {
+func New(store *store.Store, client *client.Client) *Server {
 	server := Server{
 		engine: gin.Default(),
 		store:  store,
+		client: client,
 	}
 
 	server.setRoutes()
@@ -29,6 +32,7 @@ func (s *Server) setRoutes() {
 	s.engine.GET("/miners/:address", s.GetMiner)
 	s.engine.GET("/top_miners", s.GetTopMiners)
 	s.engine.GET("/transactions", s.GetTransactions)
+	s.engine.GET("/accounts/:address", s.GetAccount)
 }
 
 // Start runs the server

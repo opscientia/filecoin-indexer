@@ -8,6 +8,12 @@ import (
 )
 
 func runServer(cfg *config.Config) error {
+	client, err := initClient(cfg)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
 	store, err := initStore(cfg)
 	if err != nil {
 		return err
@@ -18,5 +24,7 @@ func runServer(cfg *config.Config) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	return server.New(store).Start(cfg.ListenAddr())
+	server := server.New(store, client)
+
+	return server.Start(cfg.ListenAddr())
 }
