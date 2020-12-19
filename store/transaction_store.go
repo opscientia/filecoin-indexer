@@ -52,3 +52,37 @@ func (ts *transactionStore) FindAllByAddress(address string) (*[]model.Transacti
 
 	return &transactions, nil
 }
+
+// CountSentByAddress retrieves sent transactions for given addresses
+func (ts *transactionStore) CountSentByAddress(addresses ...string) (int64, error) {
+	var count int64
+
+	err := ts.db.
+		Table("transactions").
+		Where(`"from" IN ?`, addresses).
+		Count(&count).
+		Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+// CountReceivedByAddress retrieves received transactions for given addresses
+func (ts *transactionStore) CountReceivedByAddress(addresses ...string) (int64, error) {
+	var count int64
+
+	err := ts.db.
+		Table("transactions").
+		Where(`"to" IN ?`, addresses).
+		Count(&count).
+		Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

@@ -23,9 +23,19 @@ func (s *Server) GetAccount(c *gin.Context) {
 		return
 	}
 
+	id := s.client.Account.GetIDAddress(addr)
+	pubkey := s.client.Account.GetPublicKeyAddress(addr)
+
+	sent, _ := s.store.Transaction.CountSentByAddress(id, pubkey)
+	received, _ := s.store.Transaction.CountReceivedByAddress(id, pubkey)
+
 	account := model.Account{
-		Address: addr.String(),
-		Balance: decimal.NewFromBigInt(actor.Balance.Int, -18),
+		ID:                   id,
+		PublicKey:            pubkey,
+		Balance:              decimal.NewFromBigInt(actor.Balance.Int, -18),
+		Nonce:                actor.Nonce,
+		TransactionsSent:     sent,
+		TransactionsReceived: received,
 	}
 
 	c.JSON(http.StatusOK, account)
