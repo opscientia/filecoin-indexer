@@ -55,6 +55,23 @@ func (ms *minerStore) FindByHeight(address string, height int64) (*model.Miner, 
 	return &miner, nil
 }
 
+// FindAtPreviousHeight retrieves a miner record at a height lower than the given height
+func (ms *minerStore) FindAtPreviousHeight(address string, height int64) (*model.Miner, error) {
+	var miner model.Miner
+
+	err := ms.db.
+		Where("address = ? AND height < ?", address, height).
+		Order("height DESC").
+		Take(&miner).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &miner, nil
+}
+
 // FindAllByHeight retrieves all miners for a given height
 func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 	var miners []model.Miner

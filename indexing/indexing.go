@@ -26,9 +26,14 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 		NewTransactionParserTask(),
 	)
 
+	p.SetTasks(pipeline.StageSequencer,
+		NewEventSequencerTask(store),
+	)
+
 	p.SetTasks(pipeline.StagePersistor,
 		NewMinerPersistorTask(store),
 		NewTransactionPersistorTask(store),
+		NewEventPersistorTask(store),
 		NewEpochPersistorTask(store),
 	)
 

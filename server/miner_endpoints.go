@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -24,7 +25,7 @@ func (s *Server) GetMiner(c *gin.Context) {
 	height := getHeight(c, s.store)
 
 	miner, err := s.store.Miner.FindByHeight(address, height)
-	if err == gorm.ErrRecordNotFound {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}

@@ -15,6 +15,7 @@ type Store struct {
 	Epoch       epochStore
 	Miner       minerStore
 	Transaction transactionStore
+	Event       eventStore
 }
 
 // New creates a store from the connection string
@@ -34,6 +35,7 @@ func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 		Epoch:       epochStore{db: db},
 		Miner:       minerStore{db: db},
 		Transaction: transactionStore{db: db},
+		Event:       eventStore{db: db},
 	}, nil
 }
 

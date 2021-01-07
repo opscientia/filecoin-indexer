@@ -48,6 +48,7 @@ type payload struct {
 	Epoch        *model.Epoch
 	Miners       []*model.Miner
 	Transactions []*model.Transaction
+	Events       []*model.Event
 }
 
 func (p *payload) SetCurrentHeight(height int64) {
