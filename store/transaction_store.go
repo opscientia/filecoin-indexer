@@ -25,22 +25,16 @@ func (ts *transactionStore) FindOrCreate(transaction *model.Transaction) error {
 }
 
 // FindAll retrieves all transactions
-func (ts *transactionStore) FindAll() (*[]model.Transaction, error) {
+func (ts *transactionStore) FindAll(height string) (*[]model.Transaction, error) {
 	var transactions []model.Transaction
 
-	err := ts.db.Order("height DESC").Find(&transactions).Error
-	if err != nil {
-		return nil, err
+	tx := ts.db
+
+	if height != "" {
+		tx = tx.Where("height = ?", height)
 	}
 
-	return &transactions, nil
-}
-
-// FindAllByHeight retrieves all transactions for a given height
-func (ts *transactionStore) FindAllByHeight(height string) (*[]model.Transaction, error) {
-	var transactions []model.Transaction
-
-	err := ts.db.Where("height = ?", height).Find(&transactions).Error
+	err := tx.Order("height DESC").Find(&transactions).Error
 	if err != nil {
 		return nil, err
 	}
@@ -49,32 +43,16 @@ func (ts *transactionStore) FindAllByHeight(height string) (*[]model.Transaction
 }
 
 // FindAllByAddress retrieves all transactions for given addresses
-func (ts *transactionStore) FindAllByAddress(addresses ...string) (*[]model.Transaction, error) {
+func (ts *transactionStore) FindAllByAddress(height string, addresses ...string) (*[]model.Transaction, error) {
 	var transactions []model.Transaction
 
-	err := ts.db.
-		Where(`"from" IN ? OR "to" IN ?`, addresses, addresses).
-		Order("height DESC").
-		Find(&transactions).
-		Error
+	tx := ts.db.Where(`"from" IN ? OR "to" IN ?`, addresses, addresses)
 
-	if err != nil {
-		return nil, err
+	if height != "" {
+		tx = tx.Where("height = ?", height)
 	}
 
-	return &transactions, nil
-}
-
-// FindAllByAddressAndHeight retrieves all transactions for given addresses and height
-func (ts *transactionStore) FindAllByAddressAndHeight(height string, addresses ...string) (*[]model.Transaction, error) {
-	var transactions []model.Transaction
-
-	err := ts.db.
-		Where(`"from" IN ? OR "to" IN ?`, addresses, addresses).
-		Where("height = ?", height).
-		Find(&transactions).
-		Error
-
+	err := tx.Order("height DESC").Find(&transactions).Error
 	if err != nil {
 		return nil, err
 	}

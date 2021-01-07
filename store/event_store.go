@@ -16,22 +16,16 @@ func (es *eventStore) Create(event *model.Event) error {
 }
 
 // FindAll retrieves all events
-func (es *eventStore) FindAll() (*[]model.Event, error) {
+func (es *eventStore) FindAll(height string) (*[]model.Event, error) {
 	var events []model.Event
 
-	err := es.db.Order("height DESC, kind").Find(&events).Error
-	if err != nil {
-		return nil, err
+	tx := es.db
+
+	if height != "" {
+		tx = tx.Where("height = ?", height)
 	}
 
-	return &events, nil
-}
-
-// FindAllByHeight retrieves all events for a given height
-func (es *eventStore) FindAllByHeight(height string) (*[]model.Event, error) {
-	var events []model.Event
-
-	err := es.db.Where("height = ?", height).Order("kind").Find(&events).Error
+	err := tx.Order("height DESC, kind").Find(&events).Error
 	if err != nil {
 		return nil, err
 	}
@@ -40,32 +34,16 @@ func (es *eventStore) FindAllByHeight(height string) (*[]model.Event, error) {
 }
 
 // FindAllByMinerAddress retrieves all events for a given miner address
-func (es *eventStore) FindAllByMinerAddress(address string) (*[]model.Event, error) {
+func (es *eventStore) FindAllByMinerAddress(address string, height string) (*[]model.Event, error) {
 	var events []model.Event
 
-	err := es.db.
-		Where("miner_address = ?", address).
-		Order("height DESC, kind").
-		Find(&events).
-		Error
+	tx := es.db.Where("miner_address = ?", address)
 
-	if err != nil {
-		return nil, err
+	if height != "" {
+		tx = tx.Where("height = ?", height)
 	}
 
-	return &events, nil
-}
-
-// FindAllByMinerAddressAndHeight retrieves all events for a given miner address and height
-func (es *eventStore) FindAllByMinerAddressAndHeight(address string, height string) (*[]model.Event, error) {
-	var events []model.Event
-
-	err := es.db.
-		Where("miner_address = ? AND height = ?", address, height).
-		Order("kind").
-		Find(&events).
-		Error
-
+	err := tx.Order("height DESC, kind").Find(&events).Error
 	if err != nil {
 		return nil, err
 	}

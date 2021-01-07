@@ -12,6 +12,11 @@ import (
 
 // StartPipeline runs the indexing pipeline
 func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store) error {
+	source, err := NewSource(cfg, client, store)
+	if err != nil {
+		return err
+	}
+
 	p := pipeline.NewDefault(NewPayloadFactory())
 
 	p.SetTasks(pipeline.StageFetcher,
@@ -36,11 +41,6 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 		NewEventPersistorTask(store),
 		NewEpochPersistorTask(store),
 	)
-
-	source, err := NewSource(cfg, client, store)
-	if err != nil {
-		return err
-	}
 
 	err = p.Start(context.Background(), source, NewSink(), &pipeline.Options{})
 	if err != nil {
