@@ -117,7 +117,7 @@ Where:
 
 | Name        | Description                                                      | Weight |
 |-------------|------------------------------------------------------------------|--------|
-| Slashings   | Reciprocal of the number of miner's deals that have been slashed | 100    |
+| Slashes     | Reciprocal of the number of miner's deals that have been slashed | 100    |
 | Faults      | Reciprocal of the total number of miner's faults                 | 100    |
 | Power       | Miner's quality-adjusted power divided by network power          | 100    |
 | Sector Size | Miner's sector size divided by 32 GiB                            | 10     |
