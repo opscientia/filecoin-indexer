@@ -30,10 +30,12 @@ func New(store *store.Store, client *client.Client) *Server {
 func (s *Server) setRoutes() {
 	s.engine.GET("/miners", s.GetMiners)
 	s.engine.GET("/miners/:address", s.GetMiner)
+	s.engine.GET("/miners/:address/events", s.GetMinerEvents)
 	s.engine.GET("/top_miners", s.GetTopMiners)
 	s.engine.GET("/transactions", s.GetTransactions)
 	s.engine.GET("/accounts/:address", s.GetAccount)
 	s.engine.GET("/accounts/:address/transactions", s.GetAccountTransactions)
+	s.engine.GET("/events", s.GetEvents)
 }
 
 // Start runs the server

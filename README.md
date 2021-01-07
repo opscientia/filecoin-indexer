@@ -98,10 +98,12 @@ $ filecoin-indexer -config config.json -cmd=server
 |--------|-----------------------------------|--------------------------------|---------------------|
 | GET    | `/miners`                         | List of all storage miners     | `height` (optional) |
 | GET    | `/miners/:address`                | Storage miner details          | `height` (optional) |
+| GET    | `/miners/:address/events`         | List of storage miner events   | `height` (optional) |
 | GET    | `/top_miners`                     | List of top 100 storage miners | `height` (optional) |
 | GET    | `/transactions`                   | List of all transactions       | `height` (optional) |
 | GET    | `/accounts/:address`              | Account details                | —                   |
-| GET    | `/accounts/:address/transactions` | List of account's transactions | —                   |
+| GET    | `/accounts/:address/transactions` | List of account transactions   | `height` (optional) |
+| GET    | `/events`                         | List of all events             | `height` (optional) |
 
 ## Score Calculation
 
@@ -123,6 +125,8 @@ Where:
 | Sector Size | Miner's sector size divided by 32 GiB                            | 10     |
 
 ## License
+
+The application is dual-licensed under:
 
 - MIT License
 - Apache License 2.0
