@@ -8,7 +8,7 @@ import (
 
 // GetEvents lists all events
 func (s *Server) GetEvents(c *gin.Context) {
-	events, _ := s.store.Event.FindAll(c.Query("height"))
+	events, _ := s.store.Event.FindAll(c.Query("height"), c.Query("kind"))
 
 	c.JSON(http.StatusOK, events)
 }
@@ -16,9 +16,11 @@ func (s *Server) GetEvents(c *gin.Context) {
 // GetMinerEvents lists storage miner events
 func (s *Server) GetMinerEvents(c *gin.Context) {
 	address := c.Param("address")
-	height := c.Query("height")
 
-	events, _ := s.store.Event.FindAllByMinerAddress(address, height)
+	height := c.Query("height")
+	kind := c.Query("kind")
+
+	events, _ := s.store.Event.FindAllByMinerAddress(address, height, kind)
 
 	c.JSON(http.StatusOK, events)
 }
