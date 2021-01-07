@@ -94,16 +94,16 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path                              | Description                    | Parameters          |
-|--------|-----------------------------------|--------------------------------|---------------------|
-| GET    | `/miners`                         | List of all storage miners     | `height` (optional) |
-| GET    | `/miners/:address`                | Storage miner details          | `height` (optional) |
-| GET    | `/miners/:address/events`         | List of storage miner events   | `height` (optional) |
-| GET    | `/top_miners`                     | List of top 100 storage miners | `height` (optional) |
-| GET    | `/transactions`                   | List of all transactions       | `height` (optional) |
-| GET    | `/accounts/:address`              | Account details                | —                   |
-| GET    | `/accounts/:address/transactions` | List of account transactions   | `height` (optional) |
-| GET    | `/events`                         | List of all events             | `height` (optional) |
+| Method | Path                              | Description                    | Parameters       |
+|--------|-----------------------------------|--------------------------------|------------------|
+| GET    | `/miners`                         | List of all storage miners     | `height`         |
+| GET    | `/miners/:address`                | Storage miner details          | `height`         |
+| GET    | `/miners/:address/events`         | List of storage miner events   | `height`, `kind` |
+| GET    | `/top_miners`                     | List of top 100 storage miners | `height`         |
+| GET    | `/transactions`                   | List of all transactions       | `height`         |
+| GET    | `/accounts/:address`              | Account details                | —                |
+| GET    | `/accounts/:address/transactions` | List of account transactions   | `height`         |
+| GET    | `/events`                         | List of all events             | `height`, `kind` |
 
 ## Score Calculation
 
