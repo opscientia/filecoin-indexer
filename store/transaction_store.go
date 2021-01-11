@@ -25,7 +25,7 @@ func (ts *transactionStore) FindOrCreate(transaction *model.Transaction) error {
 }
 
 // FindAll retrieves all transactions
-func (ts *transactionStore) FindAll(height string) (*[]model.Transaction, error) {
+func (ts *transactionStore) FindAll(height string) ([]model.Transaction, error) {
 	var transactions []model.Transaction
 
 	tx := ts.db
@@ -39,11 +39,11 @@ func (ts *transactionStore) FindAll(height string) (*[]model.Transaction, error)
 		return nil, err
 	}
 
-	return &transactions, nil
+	return transactions, nil
 }
 
 // FindAllByAddress retrieves all transactions for given addresses
-func (ts *transactionStore) FindAllByAddress(height string, addresses ...string) (*[]model.Transaction, error) {
+func (ts *transactionStore) FindAllByAddress(height string, addresses ...string) ([]model.Transaction, error) {
 	var transactions []model.Transaction
 
 	tx := ts.db.Where(`"from" IN ? OR "to" IN ?`, addresses, addresses)
@@ -57,7 +57,7 @@ func (ts *transactionStore) FindAllByAddress(height string, addresses ...string)
 		return nil, err
 	}
 
-	return &transactions, nil
+	return transactions, nil
 }
 
 // CountSentByAddress retrieves sent transactions for given addresses

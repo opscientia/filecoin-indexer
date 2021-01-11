@@ -73,7 +73,7 @@ func (ms *minerStore) FindAtPreviousHeight(address string, height int64) (*model
 }
 
 // FindAllByHeight retrieves all miners for a given height
-func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
+func (ms *minerStore) FindAllByHeight(height int64) ([]model.Miner, error) {
 	var miners []model.Miner
 
 	err := ms.db.Where("height = ?", height).Find(&miners).Error
@@ -81,11 +81,11 @@ func (ms *minerStore) FindAllByHeight(height int64) (*[]model.Miner, error) {
 		return nil, err
 	}
 
-	return &miners, nil
+	return miners, nil
 }
 
 // FindTop100ByHeight retrieves top 100 miners for a given height
-func (ms *minerStore) FindTop100ByHeight(height int64) (*[]model.Miner, error) {
+func (ms *minerStore) FindTop100ByHeight(height int64) ([]model.Miner, error) {
 	var miners []model.Miner
 
 	err := ms.db.
@@ -99,5 +99,5 @@ func (ms *minerStore) FindTop100ByHeight(height int64) (*[]model.Miner, error) {
 		return nil, err
 	}
 
-	return &miners, nil
+	return miners, nil
 }

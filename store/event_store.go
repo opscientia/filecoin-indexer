@@ -17,7 +17,7 @@ func (es *eventStore) Create(event *model.Event) error {
 }
 
 // FindAll retrieves all events
-func (es *eventStore) FindAll(height string, kind string) (*[]model.Event, error) {
+func (es *eventStore) FindAll(height string, kind string) ([]model.Event, error) {
 	var events []model.Event
 
 	tx := es.db
@@ -35,11 +35,11 @@ func (es *eventStore) FindAll(height string, kind string) (*[]model.Event, error
 		return nil, err
 	}
 
-	return &events, nil
+	return events, nil
 }
 
 // FindAllByMinerAddress retrieves all events for a given miner address
-func (es *eventStore) FindAllByMinerAddress(address string, height string, kind string) (*[]model.Event, error) {
+func (es *eventStore) FindAllByMinerAddress(address string, height string, kind string) ([]model.Event, error) {
 	var events []model.Event
 
 	tx := es.db.Where("miner_address = ?", address)
@@ -57,7 +57,7 @@ func (es *eventStore) FindAllByMinerAddress(address string, height string, kind 
 		return nil, err
 	}
 
-	return &events, nil
+	return events, nil
 }
 
 // DealIDsByKind returns deal IDs for a given event kind
