@@ -34,9 +34,20 @@ func (t *EventPersistorTask) Run(ctx context.Context, p pipeline.Payload) error 
 		return err
 	}
 
+	slashedDealIDs, err := t.store.Event.DealIDsByKind(types.SlashedDealEvent)
+	if err != nil {
+		return err
+	}
+
 	for _, event := range payload.Events {
-		if event.Kind == types.NewDealEvent && slice.Contains(dealIDs, event.Data["deal_id"]) {
-			continue
+		if event.Kind == types.NewDealEvent {
+			if slice.Contains(dealIDs, event.Data["deal_id"]) {
+				continue
+			}
+		} else if event.Kind == types.SlashedDealEvent {
+			if slice.Contains(slashedDealIDs, event.Data["deal_id"]) {
+				continue
+			}
 		}
 
 		err := t.store.Event.Create(event)

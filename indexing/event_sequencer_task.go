@@ -38,10 +38,8 @@ func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error 
 		return err
 	}
 
-	err = t.trackNewDeals(payload)
-	if err != nil {
-		return err
-	}
+	t.trackNewDeals(payload)
+	t.trackSlashedDeals(payload)
 
 	return nil
 }
@@ -75,7 +73,7 @@ func (t *EventSequencerTask) trackStorageCapacityChanges(p *payload) error {
 	return nil
 }
 
-func (t *EventSequencerTask) trackNewDeals(p *payload) error {
+func (t *EventSequencerTask) trackNewDeals(p *payload) {
 	for dealID, deal := range p.DealsData {
 		if deal.State.SectorStartEpoch == -1 {
 			continue
@@ -97,6 +95,22 @@ func (t *EventSequencerTask) trackNewDeals(p *payload) error {
 
 		p.Events = append(p.Events, &event)
 	}
+}
 
-	return nil
+func (t *EventSequencerTask) trackSlashedDeals(p *payload) {
+	for dealID, deal := range p.DealsData {
+		if deal.State.SlashEpoch == -1 {
+			continue
+		}
+
+		event := model.Event{
+			Height:       &p.currentHeight,
+			MinerAddress: deal.Proposal.Provider.String(),
+			Kind:         types.SlashedDealEvent,
+
+			Data: map[string]interface{}{"deal_id": dealID},
+		}
+
+		p.Events = append(p.Events, &event)
+	}
 }
