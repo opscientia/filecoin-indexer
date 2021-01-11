@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -37,6 +38,11 @@ func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error 
 		return err
 	}
 
+	err = t.trackNewDeals(payload)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -64,6 +70,32 @@ func (t *EventSequencerTask) trackStorageCapacityChanges(p *payload) error {
 
 			p.Events = append(p.Events, &event)
 		}
+	}
+
+	return nil
+}
+
+func (t *EventSequencerTask) trackNewDeals(p *payload) error {
+	for dealID, deal := range p.DealsData {
+		if deal.State.SectorStartEpoch == -1 {
+			continue
+		}
+
+		event := model.Event{
+			Height:       &p.currentHeight,
+			MinerAddress: deal.Proposal.Provider.String(),
+			Kind:         types.NewDealEvent,
+
+			Data: map[string]interface{}{
+				"deal_id":        dealID,
+				"client_address": deal.Proposal.Client.String(),
+				"piece_size":     strconv.FormatUint(uint64(deal.Proposal.PieceSize), 10),
+				"storage_price":  decimal.NewFromBigInt(deal.Proposal.StoragePricePerEpoch.Int, -18),
+				"is_verified":    deal.Proposal.VerifiedDeal,
+			},
+		}
+
+		p.Events = append(p.Events, &event)
 	}
 
 	return nil

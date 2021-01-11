@@ -17,14 +17,14 @@ func (ac *accountClient) GetActor(addr address.Address) (*types.Actor, error) {
 	return ac.api.StateGetActor(context.Background(), addr, types.EmptyTSK)
 }
 
-// GetIDAddress fetches the ID address of a given address
+// GetIDAddress fetches the ID address for a given address
 func (ac *accountClient) GetIDAddress(addr address.Address) string {
 	id, _ := ac.api.StateLookupID(context.Background(), addr, types.EmptyTSK)
 
 	return id.String()
 }
 
-// GetPublicKeyAddress fetches the public key address of a given address
+// GetPublicKeyAddress fetches the public key address for a given address
 func (ac *accountClient) GetPublicKeyAddress(addr address.Address) string {
 	pubkey, _ := ac.api.StateAccountKey(context.Background(), addr, types.EmptyTSK)
 
