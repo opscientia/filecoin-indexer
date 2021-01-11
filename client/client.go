@@ -14,6 +14,7 @@ type Client struct {
 	closer jsonrpc.ClientCloser
 
 	Epoch       epochClient
+	Deal        dealClient
 	Miner       minerClient
 	Transaction transactionClient
 	Account     accountClient
@@ -37,6 +38,7 @@ func New(endpoint string) (*Client, error) {
 		closer: closer,
 
 		Epoch:       epochClient{api: &api},
+		Deal:        dealClient{api: &api},
 		Miner:       minerClient{api: &api},
 		Transaction: transactionClient{api: &api},
 		Account:     accountClient{api: &api},

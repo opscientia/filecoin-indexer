@@ -12,7 +12,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/client"
 )
 
-// TransactionFetcherTask fetches raw transaction
+// TransactionFetcherTask fetches raw transaction data
 type TransactionFetcherTask struct {
 	client *client.Client
 }

@@ -15,11 +15,6 @@ type minerClient struct {
 	api *apistruct.FullNodeStruct
 }
 
-// GetMarketDeals fetches market deals for a given tipset
-func (mc *minerClient) GetMarketDeals(tsk types.TipSetKey) (map[string]api.MarketDeal, error) {
-	return mc.api.StateMarketDeals(context.Background(), tsk)
-}
-
 // GetAddressesByTipset fetches miners' addresses for a given tipset
 func (mc *minerClient) GetAddressesByTipset(tsk types.TipSetKey) ([]address.Address, error) {
 	return mc.api.StateListMiners(context.Background(), tsk)

@@ -36,7 +36,7 @@ type payload struct {
 
 	// Fetcher stage
 	EpochTipset          *types.TipSet
-	MinersDeals          map[string]api.MarketDeal
+	DealsData            map[string]api.MarketDeal
 	MinersAddresses      []address.Address
 	MinersInfo           []*miner.MinerInfo
 	MinersPower          []*api.MinerPower

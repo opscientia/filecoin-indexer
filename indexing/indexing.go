@@ -21,6 +21,7 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 
 	p.SetTasks(pipeline.StageFetcher,
 		NewEpochFetcherTask(client),
+		NewDealFetcherTask(client),
 		NewMinerFetcherTask(client),
 		NewTransactionFetcherTask(client),
 	)

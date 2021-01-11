@@ -42,7 +42,7 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		var dealsCount uint32
 		var slashedDealsCount uint32
 
-		for _, deal := range payload.MinersDeals {
+		for _, deal := range payload.DealsData {
 			if deal.Proposal.Provider == address {
 				if deal.State.SectorStartEpoch != -1 {
 					dealsCount++

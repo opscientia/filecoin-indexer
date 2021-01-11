@@ -8,7 +8,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-// TransactionPersistorTask stores miners in the database
+// TransactionPersistorTask stores transactions in the database
 type TransactionPersistorTask struct {
 	store *store.Store
 }
