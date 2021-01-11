@@ -16,6 +16,7 @@ require (
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/pressly/goose v2.6.0+incompatible
 	github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc
+	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/gorm v1.20.5

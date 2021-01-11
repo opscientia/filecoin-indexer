@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
+	"github.com/figment-networks/filecoin-indexer/model/types"
 )
 
 type eventStore struct {
@@ -57,4 +58,22 @@ func (es *eventStore) FindAllByMinerAddress(address string, height string, kind 
 	}
 
 	return &events, nil
+}
+
+// DealIDsByKind returns deal IDs for a given event kind
+func (es *eventStore) DealIDsByKind(kind types.EventKind) ([]string, error) {
+	var result []string
+
+	err := es.db.
+		Table("events").
+		Select("data->>'deal_id'").
+		Where("kind = ?", kind).
+		Scan(&result).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
