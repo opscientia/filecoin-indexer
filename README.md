@@ -126,7 +126,7 @@ Where:
 
 ## License
 
-The application is dual-licensed under:
+This application is dual-licensed under:
 
 - MIT License
 - Apache License 2.0

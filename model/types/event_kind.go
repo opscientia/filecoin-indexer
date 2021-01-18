@@ -12,4 +12,10 @@ const (
 
 	// SlashedDealEvent represents a slash of a miner's deal
 	SlashedDealEvent EventKind = "slashed_deal"
+
+	// SectorFaultEvent represents a sector fault
+	SectorFaultEvent EventKind = "sector_fault"
+
+	// SectorRecoveryEvent represents a sector recovery
+	SectorRecoveryEvent EventKind = "sector_recovery"
 )

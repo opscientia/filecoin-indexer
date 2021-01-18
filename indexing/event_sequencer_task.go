@@ -2,12 +2,10 @@ package indexing
 
 import (
 	"context"
-	"errors"
 	"strconv"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/shopspring/decimal"
-	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/filecoin-indexer/model/types"
@@ -33,44 +31,95 @@ func (t *EventSequencerTask) GetName() string {
 func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	err := t.trackStorageCapacityChanges(payload)
+	err := t.fetchMinersAtPreviousHeight(payload)
 	if err != nil {
 		return err
 	}
 
+	t.trackStorageCapacityChanges(payload)
+	t.trackSectorFaults(payload)
 	t.trackNewDeals(payload)
 	t.trackSlashedDeals(payload)
 
 	return nil
 }
 
-func (t *EventSequencerTask) trackStorageCapacityChanges(p *payload) error {
-	for _, miner := range p.Miners {
-		oldMiner, err := t.store.Miner.FindAtPreviousHeight(miner.Address, p.currentHeight)
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				continue
-			}
-			return err
-		}
+func (t *EventSequencerTask) fetchMinersAtPreviousHeight(p *payload) error {
+	miners, err := t.store.Miner.FindAllAtPreviousHeight(p.currentHeight)
+	if err != nil {
+		return err
+	}
 
-		if *miner.RawBytePower != *oldMiner.RawBytePower {
-			event := model.Event{
-				Height:       &p.currentHeight,
-				MinerAddress: miner.Address,
-				Kind:         types.StorageCapacityChangeEvent,
+	p.StoredMiners = make(map[string]model.Miner)
 
-				Data: map[string]interface{}{
-					"from": strconv.FormatUint(*oldMiner.RawBytePower, 10),
-					"to":   strconv.FormatUint(*miner.RawBytePower, 10),
-				},
-			}
-
-			p.Events = append(p.Events, &event)
-		}
+	for _, miner := range miners {
+		p.StoredMiners[miner.Address] = miner
 	}
 
 	return nil
+}
+
+func (t *EventSequencerTask) trackStorageCapacityChanges(p *payload) {
+	for _, miner := range p.Miners {
+		oldMiner, ok := p.StoredMiners[miner.Address]
+		if !ok {
+			continue
+		}
+
+		if *miner.RawBytePower == *oldMiner.RawBytePower {
+			continue
+		}
+
+		event := model.Event{
+			Height:       &p.currentHeight,
+			MinerAddress: miner.Address,
+			Kind:         types.StorageCapacityChangeEvent,
+
+			Data: map[string]interface{}{
+				"from": strconv.FormatUint(*oldMiner.RawBytePower, 10),
+				"to":   strconv.FormatUint(*miner.RawBytePower, 10),
+			},
+		}
+
+		p.Events = append(p.Events, &event)
+	}
+}
+
+func (t *EventSequencerTask) trackSectorFaults(p *payload) {
+	for _, miner := range p.Miners {
+		oldMiner, ok := p.StoredMiners[miner.Address]
+		if !ok {
+			continue
+		}
+
+		faultsDiff := int32(*miner.FaultsCount - *oldMiner.FaultsCount)
+		if faultsDiff == 0 {
+			continue
+		}
+
+		var eventKind types.EventKind
+		var sectorsCount uint64
+
+		if faultsDiff > 0 {
+			eventKind = types.SectorFaultEvent
+			sectorsCount = uint64(faultsDiff)
+		} else {
+			eventKind = types.SectorRecoveryEvent
+			sectorsCount = uint64(-faultsDiff)
+		}
+
+		event := model.Event{
+			Height:       &p.currentHeight,
+			MinerAddress: miner.Address,
+			Kind:         eventKind,
+
+			Data: map[string]interface{}{
+				"sectors_count": strconv.FormatUint(sectorsCount, 10),
+			},
+		}
+
+		p.Events = append(p.Events, &event)
+	}
 }
 
 func (t *EventSequencerTask) trackNewDeals(p *payload) {
