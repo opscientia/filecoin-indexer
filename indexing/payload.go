@@ -51,7 +51,9 @@ type payload struct {
 	Events       []*model.Event
 
 	// Sequencer stage
-	StoredMiners map[string]model.Miner
+	StoredMiners         map[string]model.Miner
+	StoredDealIDs        []string
+	StoredSlashedDealIDs []string
 }
 
 func (p *payload) SetCurrentHeight(height int64) {

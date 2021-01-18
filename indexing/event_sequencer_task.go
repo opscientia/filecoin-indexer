@@ -6,6 +6,7 @@ import (
 
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/shopspring/decimal"
+	"github.com/stretchr/stew/slice"
 
 	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/filecoin-indexer/model/types"
@@ -36,6 +37,16 @@ func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error 
 		return err
 	}
 
+	err = t.fetchDealIDs(payload)
+	if err != nil {
+		return err
+	}
+
+	err = t.fetchSlashedDealIDs(payload)
+	if err != nil {
+		return err
+	}
+
 	t.trackStorageCapacityChanges(payload)
 	t.trackSectorFaults(payload)
 	t.trackNewDeals(payload)
@@ -55,6 +66,28 @@ func (t *EventSequencerTask) fetchMinersAtPreviousHeight(p *payload) error {
 	for _, miner := range miners {
 		p.StoredMiners[miner.Address] = miner
 	}
+
+	return nil
+}
+
+func (t *EventSequencerTask) fetchDealIDs(p *payload) error {
+	dealIDs, err := t.store.Event.DealIDsByKind(types.NewDealEvent)
+	if err != nil {
+		return err
+	}
+
+	p.StoredDealIDs = dealIDs
+
+	return nil
+}
+
+func (t *EventSequencerTask) fetchSlashedDealIDs(p *payload) error {
+	slashedDealIDs, err := t.store.Event.DealIDsByKind(types.SlashedDealEvent)
+	if err != nil {
+		return err
+	}
+
+	p.StoredSlashedDealIDs = slashedDealIDs
 
 	return nil
 }
@@ -128,6 +161,10 @@ func (t *EventSequencerTask) trackNewDeals(p *payload) {
 			continue
 		}
 
+		if slice.Contains(p.StoredDealIDs, dealID) {
+			continue
+		}
+
 		event := model.Event{
 			Height:       &p.currentHeight,
 			MinerAddress: deal.Proposal.Provider.String(),
@@ -149,6 +186,10 @@ func (t *EventSequencerTask) trackNewDeals(p *payload) {
 func (t *EventSequencerTask) trackSlashedDeals(p *payload) {
 	for dealID, deal := range p.DealsData {
 		if deal.State.SlashEpoch == -1 {
+			continue
+		}
+
+		if slice.Contains(p.StoredSlashedDealIDs, dealID) {
 			continue
 		}
 
