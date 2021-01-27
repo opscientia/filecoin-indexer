@@ -96,6 +96,8 @@ $ filecoin-indexer -config config.json -cmd=server
 
 | Method | Path                              | Description                    | Parameters       |
 |--------|-----------------------------------|--------------------------------|------------------|
+| GET    | `/health`                         | Health check                   | —                |
+| GET    | `/status`                         | Synchronization status         | —                |
 | GET    | `/miners`                         | List of all storage miners     | `height`         |
 | GET    | `/miners/:address`                | Storage miner details          | `height`         |
 | GET    | `/miners/:address/events`         | List of storage miner events   | `height`, `kind` |

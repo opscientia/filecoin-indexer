@@ -28,6 +28,8 @@ func New(store *store.Store, client *client.Client) *Server {
 }
 
 func (s *Server) setRoutes() {
+	s.engine.GET("/health", s.GetHealth)
+	s.engine.GET("/status", s.GetStatus)
 	s.engine.GET("/miners", s.GetMiners)
 	s.engine.GET("/miners/:address", s.GetMiner)
 	s.engine.GET("/miners/:address/events", s.GetMinerEvents)

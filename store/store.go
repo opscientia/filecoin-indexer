@@ -44,6 +44,16 @@ func (s *Store) Conn() (*sql.DB, error) {
 	return s.db.DB()
 }
 
+// Test checks the database connection
+func (s *Store) Test() error {
+	db, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+
+	return db.Ping()
+}
+
 // Close closes the database connection
 func (s *Store) Close() error {
 	conn, err := s.Conn()
