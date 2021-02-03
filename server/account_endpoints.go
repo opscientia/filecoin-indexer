@@ -1,33 +1,44 @@
 package server
 
 import (
-	"net/http"
+	"fmt"
 
-	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/filecoin-project/go-address"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+
+	"github.com/figment-networks/filecoin-indexer/model"
 )
 
 // GetAccount returns account details
 func (s *Server) GetAccount(c *gin.Context) {
 	addr, err := address.NewFromString(c.Param("address"))
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		badRequest(c, fmt.Sprintf("invalid address: %s", err))
 		return
 	}
 
 	actor, err := s.client.Account.GetActor(addr)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		notFound(c, err)
 		return
 	}
 
 	id := s.client.Account.GetIDAddress(addr)
 	pubkey := s.client.Account.GetPublicKeyAddress(addr)
+	addresses := []string{id, pubkey}
 
-	sent, _ := s.store.Transaction.CountSentByAddress(id, pubkey)
-	received, _ := s.store.Transaction.CountReceivedByAddress(id, pubkey)
+	sent, err := s.store.Transaction.CountSentByAddresses(addresses)
+	if err != nil {
+		serverError(c, err)
+		return
+	}
+
+	received, err := s.store.Transaction.CountReceivedByAddresses(addresses)
+	if err != nil {
+		serverError(c, err)
+		return
+	}
 
 	account := model.Account{
 		ID:                   id,
@@ -38,5 +49,5 @@ func (s *Server) GetAccount(c *gin.Context) {
 		TransactionsReceived: received,
 	}
 
-	c.JSON(http.StatusOK, account)
+	jsonOK(c, account)
 }

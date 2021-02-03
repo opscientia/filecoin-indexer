@@ -74,15 +74,38 @@ func (ms *minerStore) FindAllAtPreviousHeight(height int64) ([]model.Miner, erro
 }
 
 // FindAllByHeight retrieves all miners for a given height
-func (ms *minerStore) FindAllByHeight(height int64) ([]model.Miner, error) {
+func (ms *minerStore) FindAllByHeight(height int64, p Pagination) (*PaginatedResult, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	scope := ms.db.Table("miners").Where("height = ?", height)
+
+	var count int64
+	if err := scope.Count(&count).Error; err != nil {
+		return nil, err
+	}
+
 	var miners []model.Miner
 
-	err := ms.db.Where("height = ?", height).Find(&miners).Error
+	err := scope.
+		Offset(p.offset()).
+		Limit(p.limit()).
+		Find(&miners).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return miners, nil
+	result := &PaginatedResult{
+		Page:       p.Page,
+		Limit:      p.Limit,
+		TotalCount: count,
+		Records:    miners,
+	}
+
+	return result.update(), nil
 }
 
 // FindTop100ByHeight retrieves top 100 miners for a given height

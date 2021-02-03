@@ -17,47 +17,92 @@ func (es *eventStore) Create(event *model.Event) error {
 }
 
 // FindAll retrieves all events
-func (es *eventStore) FindAll(height string, kind string) ([]model.Event, error) {
-	var events []model.Event
+func (es *eventStore) FindAll(height string, kind string, p Pagination) (*PaginatedResult, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
 
-	tx := es.db
+	scope := es.db.Table("events").Order("height DESC, kind")
 
 	if height != "" {
-		tx = tx.Where("height = ?", height)
+		scope = scope.Where("height = ?", height)
 	}
 
 	if kind != "" {
-		tx = tx.Where("kind = ?", kind)
+		scope = scope.Where("kind = ?", kind)
 	}
 
-	err := tx.Order("height DESC, kind").Find(&events).Error
+	var count int64
+	if err := scope.Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	var events []model.Event
+
+	err := scope.
+		Offset(p.offset()).
+		Limit(p.limit()).
+		Find(&events).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return events, nil
+	result := &PaginatedResult{
+		Page:       p.Page,
+		Limit:      p.Limit,
+		TotalCount: count,
+		Records:    events,
+	}
+
+	return result.update(), nil
 }
 
 // FindAllByMinerAddress retrieves all events for a given miner address
-func (es *eventStore) FindAllByMinerAddress(address string, height string, kind string) ([]model.Event, error) {
-	var events []model.Event
+func (es *eventStore) FindAllByMinerAddress(address string, height string, kind string, p Pagination) (*PaginatedResult, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
 
-	tx := es.db.Where("miner_address = ?", address)
+	scope := es.db.
+		Table("events").
+		Where("miner_address = ?", address).
+		Order("height DESC, kind")
 
 	if height != "" {
-		tx = tx.Where("height = ?", height)
+		scope = scope.Where("height = ?", height)
 	}
 
 	if kind != "" {
-		tx = tx.Where("kind = ?", kind)
+		scope = scope.Where("kind = ?", kind)
 	}
 
-	err := tx.Order("height DESC, kind").Find(&events).Error
+	var count int64
+	if err := scope.Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	var events []model.Event
+
+	err := scope.
+		Offset(p.offset()).
+		Limit(p.limit()).
+		Find(&events).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return events, nil
+	result := &PaginatedResult{
+		Page:       p.Page,
+		Limit:      p.Limit,
+		TotalCount: count,
+		Records:    events,
+	}
+
+	return result.update(), nil
 }
 
 // DealIDsByKind returns deal IDs for a given event kind

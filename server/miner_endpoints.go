@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +13,20 @@ import (
 // GetMiners lists all storage miners
 func (s *Server) GetMiners(c *gin.Context) {
 	height := getHeight(c, s.store)
-	miners, _ := s.store.Miner.FindAllByHeight(height)
 
-	c.JSON(http.StatusOK, miners)
+	pagination := store.Pagination{}
+	if err := c.Bind(&pagination); err != nil {
+		badRequest(c, err)
+		return
+	}
+
+	result, err := s.store.Miner.FindAllByHeight(height, pagination)
+	if err != nil {
+		serverError(c, err)
+		return
+	}
+
+	jsonOK(c, result)
 }
 
 // GetMiner returns storage miner details
@@ -25,20 +35,29 @@ func (s *Server) GetMiner(c *gin.Context) {
 	height := getHeight(c, s.store)
 
 	miner, err := s.store.Miner.FindByHeight(address, height)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatus(http.StatusNotFound)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			notFound(c, nil)
+		} else {
+			serverError(c, err)
+		}
 		return
 	}
 
-	c.JSON(http.StatusOK, miner)
+	jsonOK(c, miner)
 }
 
 // GetTopMiners lists top 100 storage miners
 func (s *Server) GetTopMiners(c *gin.Context) {
 	height := getHeight(c, s.store)
-	miners, _ := s.store.Miner.FindTop100ByHeight(height)
 
-	c.JSON(http.StatusOK, miners)
+	miners, err := s.store.Miner.FindTop100ByHeight(height)
+	if err != nil {
+		serverError(c, err)
+		return
+	}
+
+	jsonOK(c, miners)
 }
 
 func getHeight(c *gin.Context, store *store.Store) int64 {

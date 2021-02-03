@@ -1,33 +1,59 @@
 package server
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/filecoin-project/go-address"
 	"github.com/gin-gonic/gin"
+
+	"github.com/figment-networks/filecoin-indexer/store"
 )
 
 // GetTransactions lists all transactions
 func (s *Server) GetTransactions(c *gin.Context) {
-	transactions, _ := s.store.Transaction.FindAll(c.Query("height"))
+	height := c.Query("height")
 
-	c.JSON(http.StatusOK, transactions)
+	pagination := store.Pagination{}
+	if err := c.Bind(&pagination); err != nil {
+		badRequest(c, err)
+		return
+	}
+
+	result, err := s.store.Transaction.FindAll(height, pagination)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
+
+	jsonOK(c, result)
 }
 
 // GetAccountTransactions returns account transactions
 func (s *Server) GetAccountTransactions(c *gin.Context) {
 	addr, err := address.NewFromString(c.Param("address"))
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		badRequest(c, fmt.Sprintf("invalid address: %s", err))
 		return
+	}
+
+	addresses := []string{
+		s.client.Account.GetIDAddress(addr),
+		s.client.Account.GetPublicKeyAddress(addr),
 	}
 
 	height := c.Query("height")
 
-	id := s.client.Account.GetIDAddress(addr)
-	pubkey := s.client.Account.GetPublicKeyAddress(addr)
+	pagination := store.Pagination{}
+	if err := c.Bind(&pagination); err != nil {
+		badRequest(c, err)
+		return
+	}
 
-	transactions, _ := s.store.Transaction.FindAllByAddress(height, id, pubkey)
+	result, err := s.store.Transaction.FindAllByAddresses(addresses, height, pagination)
+	if err != nil {
+		badRequest(c, err)
+		return
+	}
 
-	c.JSON(http.StatusOK, transactions)
+	jsonOK(c, result)
 }

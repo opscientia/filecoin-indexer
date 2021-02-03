@@ -8,28 +8,34 @@ import (
 
 // GetHealth checks the health of the indexer
 func (s *Server) GetHealth(c *gin.Context) {
-	storeErr := s.store.Test()
-	_, clientErr := s.client.Epoch.GetCurrentHeight()
-
-	if storeErr != nil || clientErr != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+	if err := s.store.Test(); err != nil {
+		serverError(c, err)
 		return
 	}
 
-	c.AbortWithStatus(http.StatusOK)
+	if _, err := s.client.Epoch.GetCurrentHeight(); err != nil {
+		serverError(c, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 // GetStatus returns the synchronization status
 func (s *Server) GetStatus(c *gin.Context) {
-	lastSyncedEpoch, _ := s.store.Epoch.LastHeight()
-
-	currentEpoch, err := s.client.Epoch.GetCurrentHeight()
+	lastSyncedEpoch, err := s.store.Epoch.LastHeight()
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		serverError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	currentEpoch, err := s.client.Epoch.GetCurrentHeight()
+	if err != nil {
+		serverError(c, err)
+		return
+	}
+
+	jsonOK(c, gin.H{
 		"current_epoch":     currentEpoch,
 		"last_synced_epoch": lastSyncedEpoch,
 	})

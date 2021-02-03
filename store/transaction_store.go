@@ -25,43 +25,88 @@ func (ts *transactionStore) FindOrCreate(transaction *model.Transaction) error {
 }
 
 // FindAll retrieves all transactions
-func (ts *transactionStore) FindAll(height string) ([]model.Transaction, error) {
-	var transactions []model.Transaction
-
-	tx := ts.db
-
-	if height != "" {
-		tx = tx.Where("height = ?", height)
+func (ts *transactionStore) FindAll(height string, p Pagination) (*PaginatedResult, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
 	}
 
-	err := tx.Order("height DESC").Find(&transactions).Error
+	scope := ts.db.Table("transactions").Order("height DESC")
+
+	if height != "" {
+		scope = scope.Where("height = ?", height)
+	}
+
+	var count int64
+	if err := scope.Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	var transactions []model.Transaction
+
+	err := scope.
+		Offset(p.offset()).
+		Limit(p.limit()).
+		Find(&transactions).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return transactions, nil
-}
-
-// FindAllByAddress retrieves all transactions for given addresses
-func (ts *transactionStore) FindAllByAddress(height string, addresses ...string) ([]model.Transaction, error) {
-	var transactions []model.Transaction
-
-	tx := ts.db.Where(`"from" IN ? OR "to" IN ?`, addresses, addresses)
-
-	if height != "" {
-		tx = tx.Where("height = ?", height)
+	result := &PaginatedResult{
+		Page:       p.Page,
+		Limit:      p.Limit,
+		TotalCount: count,
+		Records:    transactions,
 	}
 
-	err := tx.Order("height DESC").Find(&transactions).Error
+	return result.update(), nil
+}
+
+// FindAllByAddress retrieves all transactions for the given addresses
+func (ts *transactionStore) FindAllByAddresses(addresses []string, height string, p Pagination) (*PaginatedResult, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+
+	scope := ts.db.
+		Table("transactions").
+		Where(`"from" IN ? OR "to" IN ?`, addresses, addresses).
+		Order("height DESC")
+
+	if height != "" {
+		scope = scope.Where("height = ?", height)
+	}
+
+	var count int64
+	if err := scope.Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	var transactions []model.Transaction
+
+	err := scope.
+		Offset(p.offset()).
+		Limit(p.limit()).
+		Find(&transactions).
+		Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	return transactions, nil
+	result := &PaginatedResult{
+		Page:       p.Page,
+		Limit:      p.Limit,
+		TotalCount: count,
+		Records:    transactions,
+	}
+
+	return result.update(), nil
 }
 
-// CountSentByAddress retrieves sent transactions for given addresses
-func (ts *transactionStore) CountSentByAddress(addresses ...string) (int64, error) {
+// CountSentByAddress retrieves sent transactions for the given addresses
+func (ts *transactionStore) CountSentByAddresses(addresses []string) (int64, error) {
 	var count int64
 
 	err := ts.db.
@@ -77,8 +122,8 @@ func (ts *transactionStore) CountSentByAddress(addresses ...string) (int64, erro
 	return count, nil
 }
 
-// CountReceivedByAddress retrieves received transactions for given addresses
-func (ts *transactionStore) CountReceivedByAddress(addresses ...string) (int64, error) {
+// CountReceivedByAddress retrieves received transactions for the given addresses
+func (ts *transactionStore) CountReceivedByAddresses(addresses []string) (int64, error) {
 	var count int64
 
 	err := ts.db.

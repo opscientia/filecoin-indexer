@@ -94,18 +94,18 @@ $ filecoin-indexer -config config.json -cmd=server
 
 ## API Reference
 
-| Method | Path                              | Description                    | Parameters       |
-|--------|-----------------------------------|--------------------------------|------------------|
-| GET    | `/health`                         | Health check                   | —                |
-| GET    | `/status`                         | Synchronization status         | —                |
-| GET    | `/miners`                         | List of all storage miners     | `height`         |
-| GET    | `/miners/:address`                | Storage miner details          | `height`         |
-| GET    | `/miners/:address/events`         | List of storage miner events   | `height`, `kind` |
-| GET    | `/top_miners`                     | List of top 100 storage miners | `height`         |
-| GET    | `/transactions`                   | List of all transactions       | `height`         |
-| GET    | `/accounts/:address`              | Account details                | —                |
-| GET    | `/accounts/:address/transactions` | List of account transactions   | `height`         |
-| GET    | `/events`                         | List of all events             | `height`, `kind` |
+| Method | Path                              | Description                    | Parameters                        |
+|--------|-----------------------------------|--------------------------------|-----------------------------------|
+| GET    | `/health`                         | Health check                   | —                                 |
+| GET    | `/status`                         | Synchronization status         | —                                 |
+| GET    | `/miners`                         | List of all storage miners     | `height`, `page`, `limit`         |
+| GET    | `/miners/:address`                | Storage miner details          | `height`                          |
+| GET    | `/miners/:address/events`         | List of storage miner events   | `height`, `kind`, `page`, `limit` |
+| GET    | `/top_miners`                     | List of top 100 storage miners | `height`                          |
+| GET    | `/transactions`                   | List of all transactions       | `height`, `page`, `limit`         |
+| GET    | `/accounts/:address`              | Account details                | —                                 |
+| GET    | `/accounts/:address/transactions` | List of account transactions   | `height`, `page`, `limit`         |
+| GET    | `/events`                         | List of all events             | `height`, `kind`, `page`, `limit` |
 
 ## Score Calculation
 
