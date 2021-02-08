@@ -10,7 +10,7 @@ type epochStore struct {
 	db *gorm.DB
 }
 
-// Create stores an epoch record
+// Create inserts the epoch record
 func (es *epochStore) Create(epoch *model.Epoch) error {
 	return es.db.Create(epoch).Error
 }

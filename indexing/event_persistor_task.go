@@ -27,11 +27,13 @@ func (t *EventPersistorTask) GetName() string {
 func (t *EventPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	for _, event := range payload.Events {
-		err := t.store.Event.Create(event)
-		if err != nil {
-			return err
-		}
+	if len(payload.Events) == 0 {
+		return nil
+	}
+
+	err := t.store.Event.Create(payload.Events)
+	if err != nil {
+		return err
 	}
 
 	return nil

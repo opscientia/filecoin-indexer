@@ -10,33 +10,9 @@ type minerStore struct {
 	db *gorm.DB
 }
 
-// CreateOrUpdate stores or updates a miner record
-func (ms *minerStore) CreateOrUpdate(miner *model.Miner) (*model.Miner, error) {
-	result := model.Miner{}
-
-	err := ms.db.
-		Where(model.Miner{
-			Height:  miner.Height,
-			Address: miner.Address,
-		}).
-		Assign(model.Miner{
-			SectorSize:        miner.SectorSize,
-			RawBytePower:      miner.RawBytePower,
-			QualityAdjPower:   miner.QualityAdjPower,
-			RelativePower:     miner.RelativePower,
-			FaultsCount:       miner.FaultsCount,
-			DealsCount:        miner.DealsCount,
-			SlashedDealsCount: miner.SlashedDealsCount,
-			Score:             miner.Score,
-		}).
-		FirstOrCreate(&result).
-		Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+// Create bulk-inserts the miner records
+func (ms *minerStore) Create(miners []*model.Miner) error {
+	return ms.db.Create(&miners).Error
 }
 
 // FindByHeight retrieves a miner record for a given height

@@ -27,11 +27,13 @@ func (t *MinerPersistorTask) GetName() string {
 func (t *MinerPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	for _, miner := range payload.Miners {
-		_, err := t.store.Miner.CreateOrUpdate(miner)
-		if err != nil {
-			return err
-		}
+	if len(payload.Miners) == 0 {
+		return nil
+	}
+
+	err := t.store.Miner.Create(payload.Miners)
+	if err != nil {
+		return err
 	}
 
 	return nil

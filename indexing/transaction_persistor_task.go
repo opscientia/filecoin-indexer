@@ -27,11 +27,13 @@ func (t *TransactionPersistorTask) GetName() string {
 func (t *TransactionPersistorTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	for _, transaction := range payload.Transactions {
-		err := t.store.Transaction.FindOrCreate(transaction)
-		if err != nil {
-			return err
-		}
+	if len(payload.Transactions) == 0 {
+		return nil
+	}
+
+	err := t.store.Transaction.Create(payload.Transactions)
+	if err != nil {
+		return err
 	}
 
 	return nil
