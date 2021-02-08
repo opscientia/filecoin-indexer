@@ -37,14 +37,17 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 	)
 
 	p.SetTasks(pipeline.StagePersistor,
+		NewBeginTransactionTask(store),
 		NewMinerPersistorTask(store),
 		NewTransactionPersistorTask(store),
 		NewEventPersistorTask(store),
 		NewEpochPersistorTask(store),
+		NewCommitTransactionTask(store),
 	)
 
 	err = p.Start(context.Background(), source, NewSink(), &pipeline.Options{})
 	if err != nil {
+		store.Rollback()
 		return err
 	}
 
