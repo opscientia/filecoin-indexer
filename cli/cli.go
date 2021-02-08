@@ -89,5 +89,5 @@ func initStore(cfg *config.Config) (*store.Store, error) {
 }
 
 func initClient(cfg *config.Config) (*client.Client, error) {
-	return client.New(cfg.RPCEndpoint)
+	return client.New(cfg.RPCEndpoint, cfg.ClientTimeout())
 }

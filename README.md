@@ -51,6 +51,7 @@ Example:
 ```json
 {
   "rpc_endpoint": "5.6.7.8:1234",
+  "rpc_timeout": "30s",
   "database_dsn": "dbname=filecoin-indexer",
   "server_addr": "localhost",
   "server_port": 8080,
@@ -65,6 +66,7 @@ Example:
 | Name             | Description               | Default Value | Required |
 |------------------|---------------------------|---------------|----------|
 | `RPC_ENDPOINT`   | Lotus RPC endpoint        | —             | Yes      |
+| `RPC_TIMEOUT`    | RPC client timeout        | `30s`         | No       |
 | `DATABASE_DSN`   | PostgreSQL database URL   | —             | Yes      |
 | `SERVER_ADDR`    | HTTP server address       | `0.0.0.0`     | No       |
 | `SERVER_PORT`    | HTTP server port          | `8080`        | No       |

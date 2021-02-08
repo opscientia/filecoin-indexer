@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/filecoin-project/lotus/api/apistruct"
@@ -20,15 +21,22 @@ type Client struct {
 	Account     accountClient
 }
 
-// New creates a Filecoin client
-func New(endpoint string) (*Client, error) {
+// New creates a JSON RPC client
+func New(endpoint string, timeout time.Duration) (*Client, error) {
 	var api apistruct.FullNodeStruct
 
 	ctx := context.Background()
 	addr := "ws://" + endpoint + "/rpc/v0"
 	outs := []interface{}{&api.Internal, &api.CommonStruct.Internal}
 
-	closer, err := jsonrpc.NewMergeClient(ctx, addr, "Filecoin", outs, http.Header{})
+	closer, err := jsonrpc.NewMergeClient(
+		ctx,
+		addr,
+		"Filecoin",
+		outs,
+		http.Header{},
+		jsonrpc.WithTimeout(timeout))
+
 	if err != nil {
 		return nil, err
 	}
