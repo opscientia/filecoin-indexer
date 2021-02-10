@@ -3,6 +3,7 @@ package indexing
 import (
 	"context"
 
+	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -10,20 +11,30 @@ import (
 )
 
 // MinerParserTask transforms raw miner data
-type MinerParserTask struct{}
+type MinerParserTask struct {
+	observer metrics.Observer
+}
+
+// MinerParserTaskName represents the name of the task
+const MinerParserTaskName = "MinerParser"
 
 // NewMinerParserTask creates the task
 func NewMinerParserTask() pipeline.Task {
-	return &MinerParserTask{}
+	return &MinerParserTask{
+		observer: pipelineTaskDuration.WithLabels(MinerParserTaskName),
+	}
 }
 
 // GetName returns the task name
 func (t *MinerParserTask) GetName() string {
-	return "MinerParser"
+	return MinerParserTaskName
 }
 
 // Run performs the task
 func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
+	timer := metrics.NewTimer(t.observer)
+	defer timer.ObserveDuration()
+
 	payload := p.(*payload)
 
 	for i, address := range payload.MinersAddresses {

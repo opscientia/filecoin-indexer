@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/lotus/chain/types"
@@ -14,21 +15,31 @@ import (
 
 // TransactionFetcherTask fetches raw transaction data
 type TransactionFetcherTask struct {
-	client *client.Client
+	client   *client.Client
+	observer metrics.Observer
 }
+
+// TransactionFetcherTaskName represents the name of the task
+const TransactionFetcherTaskName = "TransactionFetcher"
 
 // NewTransactionFetcherTask creates the task
 func NewTransactionFetcherTask(client *client.Client) pipeline.Task {
-	return &TransactionFetcherTask{client: client}
+	return &TransactionFetcherTask{
+		client:   client,
+		observer: pipelineTaskDuration.WithLabels(TransactionFetcherTaskName),
+	}
 }
 
 // GetName returns the task name
 func (t *TransactionFetcherTask) GetName() string {
-	return "TransactionFetcher"
+	return TransactionFetcherTaskName
 }
 
 // Run performs the task
 func (t *TransactionFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
+	timer := metrics.NewTimer(t.observer)
+	defer timer.ObserveDuration()
+
 	payload := p.(*payload)
 
 	eg, _ := errgroup.WithContext(ctx)
