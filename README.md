@@ -98,8 +98,6 @@ $ filecoin-indexer -config config.json -cmd=server
 
 | Method | Path                              | Description                    | Parameters                        |
 |--------|-----------------------------------|--------------------------------|-----------------------------------|
-| GET    | `/health`                         | Health check                   | —                                 |
-| GET    | `/status`                         | Synchronization status         | —                                 |
 | GET    | `/miners`                         | List of all storage miners     | `height`, `page`, `limit`         |
 | GET    | `/miners/:address`                | Storage miner details          | `height`                          |
 | GET    | `/miners/:address/events`         | List of storage miner events   | `height`, `kind`, `page`, `limit` |
@@ -108,6 +106,9 @@ $ filecoin-indexer -config config.json -cmd=server
 | GET    | `/accounts/:address`              | Account details                | —                                 |
 | GET    | `/accounts/:address/transactions` | List of account transactions   | `height`, `page`, `limit`         |
 | GET    | `/events`                         | List of all events             | `height`, `kind`, `page`, `limit` |
+| GET    | `/health`                         | Health check                   | —                                 |
+| GET    | `/status`                         | Synchronization status         | —                                 |
+| GET    | `/metrics`                        | Prometheus metrics             | —                                 |
 
 ## Score Calculation
 

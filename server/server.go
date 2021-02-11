@@ -1,6 +1,8 @@
 package server
 
 import (
+	"github.com/figment-networks/indexing-engine/metrics"
+	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
 	"github.com/gin-gonic/gin"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -22,9 +24,14 @@ func New(store *store.Store, client *client.Client) *Server {
 		client: client,
 	}
 
+	server.setMiddleware()
 	server.setRoutes()
 
 	return &server
+}
+
+func (s *Server) setMiddleware() {
+	s.engine.Use(MetricsMiddleware())
 }
 
 func (s *Server) setRoutes() {
@@ -42,5 +49,19 @@ func (s *Server) setRoutes() {
 
 // Start runs the server
 func (s *Server) Start(listenAddr string) error {
+	prom := prometheusmetrics.New()
+
+	err := metrics.AddEngine(prom)
+	if err != nil {
+		return err
+	}
+
+	err = metrics.Hotload(prom.Name())
+	if err != nil {
+		return err
+	}
+
+	s.engine.GET("/metrics", gin.WrapH(metrics.Handler()))
+
 	return s.engine.Run(listenAddr)
 }
