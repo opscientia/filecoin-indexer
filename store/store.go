@@ -11,6 +11,7 @@ import (
 // Store handles database operations
 type Store struct {
 	db *gorm.DB
+	tx *gorm.DB
 
 	Epoch       epochStore
 	Miner       minerStore
@@ -20,8 +21,6 @@ type Store struct {
 
 // New creates a store from the connection string
 func New(connStr string, logMode logger.LogLevel) (*Store, error) {
-	store := &Store{}
-
 	config := gorm.Config{
 		SkipDefaultTransaction: true,
 
@@ -33,7 +32,9 @@ func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 		return nil, err
 	}
 
-	return store.setSession(db), nil
+	store := &Store{db: db}
+
+	return store.setTransaction(db), nil
 }
 
 // Conn returns the underlying database connection
@@ -53,19 +54,21 @@ func (s *Store) Test() error {
 
 // Begin starts a database transaction
 func (s *Store) Begin() error {
-	db := s.db.Begin()
-	if db.Error != nil {
-		return db.Error
+	tx := s.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
 	}
 
-	s.setSession(db)
+	s.setTransaction(tx)
 
 	return nil
 }
 
 // Commit commits the database transaction
 func (s *Store) Commit() error {
-	err := s.db.Commit().Error
+	defer s.clearTransaction()
+
+	err := s.tx.Commit().Error
 	if err != nil {
 		return err
 	}
@@ -74,7 +77,9 @@ func (s *Store) Commit() error {
 
 // Rollback rolls back the database transaction
 func (s *Store) Rollback() error {
-	err := s.db.Rollback().Error
+	defer s.clearTransaction()
+
+	err := s.tx.Rollback().Error
 	if err != nil {
 		return err
 	}
@@ -91,13 +96,17 @@ func (s *Store) Close() error {
 	return conn.Close()
 }
 
-func (s *Store) setSession(db *gorm.DB) *Store {
-	s.db = db
+func (s *Store) setTransaction(tx *gorm.DB) *Store {
+	s.tx = tx
 
-	s.Epoch = epochStore{db: db}
-	s.Miner = minerStore{db: db}
-	s.Transaction = transactionStore{db: db}
-	s.Event = eventStore{db: db}
+	s.Epoch = epochStore{db: tx}
+	s.Miner = minerStore{db: tx}
+	s.Transaction = transactionStore{db: tx}
+	s.Event = eventStore{db: tx}
 
 	return s
+}
+
+func (s *Store) clearTransaction() *Store {
+	return s.setTransaction(s.db)
 }
