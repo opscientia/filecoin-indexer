@@ -52,6 +52,22 @@ func (s *Store) Test() error {
 	return db.Ping()
 }
 
+// DatabaseSize returns the size of the database
+func (s *Store) DatabaseSize() (int64, error) {
+	var result int64
+
+	err := s.tx.
+		Raw("SELECT pg_database_size(current_database())").
+		Scan(&result).
+		Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
+}
+
 // Begin starts a database transaction
 func (s *Store) Begin() error {
 	tx := s.db.Begin()

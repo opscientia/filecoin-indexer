@@ -2,19 +2,43 @@ package indexing
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
+
+	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-// NewSink creates a pipeline sink
-func NewSink() pipeline.Sink {
-	return &sink{}
+type sink struct {
+	store *store.Store
+
+	heightCounter          metrics.Counter
+	heightDurationObserver metrics.Observer
+	databaseSizeObserver   metrics.Observer
 }
 
-type sink struct{}
+// NewSink creates a pipeline sink
+func NewSink(store *store.Store) pipeline.Sink {
+	return &sink{
+		store: store,
+
+		heightCounter:          pipelineHeightsTotal.WithLabels(),
+		heightDurationObserver: pipelineHeightDuration.WithLabels(),
+		databaseSizeObserver:   pipelineDatabaseSizeAfterHeight.WithLabels(),
+	}
+}
 
 func (s sink) Consume(ctx context.Context, p pipeline.Payload) error {
-	fmt.Println("sink")
+	payload := p.(*payload)
+
+	s.heightCounter.Inc()
+	s.heightDurationObserver.Observe(payload.Duration())
+
+	size, err := s.store.DatabaseSize()
+	if err != nil {
+		return err
+	}
+	s.databaseSizeObserver.Observe(float64(size))
+
 	return nil
 }

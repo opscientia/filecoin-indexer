@@ -1,6 +1,8 @@
 package indexing
 
 import (
+	"time"
+
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
@@ -27,10 +29,14 @@ type PayloadFactory struct{}
 
 // GetPayload returns a payload for a given height
 func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
-	return &payload{currentHeight: height}
+	return &payload{
+		startedAt:     time.Now(),
+		currentHeight: height,
+	}
 }
 
 type payload struct {
+	startedAt     time.Time
 	currentHeight int64
 	processed     bool
 
@@ -70,4 +76,8 @@ func (p *payload) MarkAsProcessed() {
 
 func (p *payload) IsProcessed() bool {
 	return p.processed
+}
+
+func (p *payload) Duration() float64 {
+	return time.Now().Sub(p.startedAt).Seconds()
 }
