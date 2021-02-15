@@ -57,22 +57,27 @@ Example:
   "server_port": 8080,
   "initial_height": 0,
   "batch_size": 100,
+  "rollbar_token": "a672d00ae7967e33e6f07a9cbdbefb2a",
+  "rollbar_server_root": "/home/deploy/filecoin-indexer",
   "debug": true
 }
 ```
 
 ### Environment variables
 
-| Name             | Description               | Default Value | Required |
-|------------------|---------------------------|---------------|----------|
-| `RPC_ENDPOINT`   | Lotus RPC endpoint        | —             | Yes      |
-| `RPC_TIMEOUT`    | RPC client timeout        | `30s`         | No       |
-| `DATABASE_DSN`   | PostgreSQL database URL   | —             | Yes      |
-| `SERVER_ADDR`    | HTTP server address       | `0.0.0.0`     | No       |
-| `SERVER_PORT`    | HTTP server port          | `8080`        | No       |
-| `INITIAL_HEIGHT` | Initial sync height       | `0`           | No       |
-| `BATCH_SIZE`     | Limit of heights per sync | —             | No       |
-| `DEBUG`          | Debug mode                | `false`       | No       |
+| Name                  | Description               | Default Value | Required |
+|-----------------------|---------------------------|---------------|----------|
+| `APP_ENV`             | Application environment   | `development` | Yes      |
+| `RPC_ENDPOINT`        | Lotus RPC endpoint        | —             | Yes      |
+| `RPC_TIMEOUT`         | RPC client timeout        | `30s`         | No       |
+| `DATABASE_DSN`        | PostgreSQL database URL   | —             | Yes      |
+| `SERVER_ADDR`         | HTTP server address       | `0.0.0.0`     | No       |
+| `SERVER_PORT`         | HTTP server port          | `8080`        | No       |
+| `INITIAL_HEIGHT`      | Initial sync height       | `0`           | No       |
+| `BATCH_SIZE`          | Limit of heights per sync | —             | No       |
+| `ROLLBAR_TOKEN`       | Rollbar token             | —             | No       |
+| `ROLLBAR_SERVER_ROOT` | Rollbar server root       | —             | No       |
+| `DEBUG`               | Debug mode                | `false`       | No       |
 
 ## Running Application
 

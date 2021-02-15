@@ -18,14 +18,17 @@ var (
 
 // Config holds the configuration data
 type Config struct {
-	RPCEndpoint   string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
-	RPCTimeout    string `json:"rpc_timeout" envconfig:"RPC_TIMEOUT" default:"30s"`
-	DatabaseDSN   string `json:"database_dsn" envconfig:"DATABASE_DSN"`
-	ServerAddr    string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
-	ServerPort    uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
-	InitialHeight int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
-	BatchSize     int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
-	Debug         bool   `json:"debug" envconfig:"DEBUG"`
+	AppEnv            string `json:"app_env" envconfig:"APP_ENV" default:"development"`
+	RPCEndpoint       string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
+	RPCTimeout        string `json:"rpc_timeout" envconfig:"RPC_TIMEOUT" default:"30s"`
+	DatabaseDSN       string `json:"database_dsn" envconfig:"DATABASE_DSN"`
+	ServerAddr        string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
+	ServerPort        uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
+	InitialHeight     int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
+	BatchSize         int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
+	RollbarToken      string `json:"rollbar_token" envconfig:"ROLLBAR_TOKEN"`
+	RollbarServerRoot string `json:"rollbar_server_root" envconfig:"ROLLBAR_SERVER_ROOT"`
+	Debug             bool   `json:"debug" envconfig:"DEBUG"`
 
 	rpcTimeout time.Duration
 }

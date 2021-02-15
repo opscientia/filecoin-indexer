@@ -79,5 +79,5 @@ func (p *payload) IsProcessed() bool {
 }
 
 func (p *payload) Duration() float64 {
-	return time.Now().Sub(p.startedAt).Seconds()
+	return time.Since(p.startedAt).Seconds()
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/rollbar/rollbar-go"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
@@ -51,7 +52,11 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 	err = p.Start(context.Background(), source, sink, &pipeline.Options{})
 	if err != nil {
 		store.Rollback()
+
 		errorCounter.Inc()
+
+		rollbar.Error(err)
+		rollbar.Wait()
 
 		return err
 	}

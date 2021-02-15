@@ -3,13 +3,27 @@ package server
 import (
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/gin-gonic/gin"
+
+	"github.com/figment-networks/filecoin-indexer/config"
 )
 
 // MetricsMiddleware logs the execution time of every request
 func MetricsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		t := metrics.NewTimer(serverRequestDuration.WithLabels(c.Request.URL.Path))
+		path := c.Request.URL.Path
+		observer := serverRequestDuration.WithLabels(path)
+
+		t := metrics.NewTimer(observer)
 		defer t.ObserveDuration()
+
+		c.Next()
+	}
+}
+
+// RollbarMiddleware reports panics to Rollbar
+func RollbarMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer config.LogPanic()
 		c.Next()
 	}
 }

@@ -32,6 +32,7 @@ func New(store *store.Store, client *client.Client) *Server {
 
 func (s *Server) setMiddleware() {
 	s.engine.Use(MetricsMiddleware())
+	s.engine.Use(RollbarMiddleware())
 }
 
 func (s *Server) setRoutes() {

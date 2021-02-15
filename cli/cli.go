@@ -26,6 +26,9 @@ func Run() {
 		terminate(err)
 	}
 
+	config.InitRollbar(cfg)
+	defer config.LogPanic()
+
 	if command == "" {
 		terminate("Command is required")
 	}
@@ -49,9 +52,7 @@ func runCommand(cfg *config.Config, name string) error {
 }
 
 func terminate(message interface{}) {
-	if message != nil {
-		log.Fatal("ERROR: ", message)
-	}
+	log.Fatal("ERROR: ", message)
 }
 
 func initConfig(path string) (*config.Config, error) {
