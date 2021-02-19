@@ -23,8 +23,18 @@ func runSync(cfg *config.Config) error {
 	}
 	defer store.Close()
 
+	err = initMetrics(cfg)
+	if err != nil {
+		return err
+	}
+
+	return indexing.StartPipeline(cfg, client, store)
+}
+
+func initMetrics(cfg *config.Config) error {
 	prom := prometheusmetrics.New()
-	err = metrics.AddEngine(prom)
+
+	err := metrics.AddEngine(prom)
 	if err != nil {
 		return err
 	}
@@ -34,14 +44,19 @@ func runSync(cfg *config.Config) error {
 		return err
 	}
 
-	s := &http.Server{
-		Addr:    cfg.ListenAddr(),
+	server := &http.Server{
+		Addr:    cfg.MetricsListenAddr(),
 		Handler: metrics.Handler(),
 	}
 
 	go func() {
-		s.ListenAndServe()
+		defer config.LogPanic()
+
+		err := server.ListenAndServe()
+		if err != nil {
+			panic(err)
+		}
 	}()
 
-	return indexing.StartPipeline(cfg, client, store)
+	return nil
 }

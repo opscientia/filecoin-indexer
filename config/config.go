@@ -26,6 +26,9 @@ type Config struct {
 	ServerPort        uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
 	InitialHeight     int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
 	BatchSize         int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
+	MetricsAddr       string `json:"metrics_addr" envconfig:"METRICS_ADDR" default:"127.0.0.1"`
+	MetricsPort       uint16 `json:"metrics_port" envconfig:"METRICS_PORT" default:"8090"`
+	MetricsPath       string `json:"metrics_path" envconfig:"METRICS_PATH" default:"/metrics"`
 	RollbarToken      string `json:"rollbar_token" envconfig:"ROLLBAR_TOKEN"`
 	RollbarServerRoot string `json:"rollbar_server_root" envconfig:"ROLLBAR_SERVER_ROOT"`
 	Debug             bool   `json:"debug" envconfig:"DEBUG"`
@@ -72,9 +75,18 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// ListenAddr returns the listen address for the API server
-func (c *Config) ListenAddr() string {
-	return fmt.Sprintf("%s:%d", c.ServerAddr, c.ServerPort)
+// ServerListenAddr returns the listen address for the API server
+func (c *Config) ServerListenAddr() string {
+	return listenAddr(c.ServerAddr, c.ServerPort)
+}
+
+// MetricsListenAddr returns the listen address for the metrics server
+func (c *Config) MetricsListenAddr() string {
+	return listenAddr(c.MetricsAddr, c.MetricsPort)
+}
+
+func listenAddr(addr string, port uint16) string {
+	return fmt.Sprintf("%s:%d", addr, port)
 }
 
 // ClientTimeout returns the timeout for the RPC client

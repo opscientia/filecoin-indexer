@@ -8,13 +8,16 @@ import (
 )
 
 // MetricsMiddleware logs the execution time of every request
-func MetricsMiddleware() gin.HandlerFunc {
+func MetricsMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
-		observer := serverRequestDuration.WithLabels(path)
 
-		t := metrics.NewTimer(observer)
-		defer t.ObserveDuration()
+		if path != cfg.MetricsPath {
+			observer := serverRequestDuration.WithLabels(path)
+
+			t := metrics.NewTimer(observer)
+			defer t.ObserveDuration()
+		}
 
 		c.Next()
 	}

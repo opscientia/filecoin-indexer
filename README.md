@@ -57,6 +57,9 @@ Example:
   "server_port": 8080,
   "initial_height": 0,
   "batch_size": 100,
+  "metrics_addr": "127.0.0.1",
+  "metrics_port": "8090",
+  "metrics_path": "/metrics",
   "rollbar_token": "a672d00ae7967e33e6f07a9cbdbefb2a",
   "rollbar_server_root": "/home/deploy/filecoin-indexer",
   "debug": true
@@ -75,6 +78,9 @@ Example:
 | `SERVER_PORT`         | HTTP server port          | `8080`        | No       |
 | `INITIAL_HEIGHT`      | Initial sync height       | `0`           | No       |
 | `BATCH_SIZE`          | Limit of heights per sync | —             | No       |
+| `METRICS_ADDR`        | Metrics server address    | `127.0.0.1`   | No       |
+| `METRICS_PORT`        | Metrics server port       | `8090`        | No       |
+| `METRICS_PATH`        | Metrics endpoint path     | `/metrics`    | No       |
 | `ROLLBAR_TOKEN`       | Rollbar token             | —             | No       |
 | `ROLLBAR_SERVER_ROOT` | Rollbar server root       | —             | No       |
 | `DEBUG`               | Debug mode                | `false`       | No       |
@@ -113,7 +119,6 @@ $ filecoin-indexer -config config.json -cmd=server
 | GET    | `/events`                         | List of all events             | `height`, `kind`, `page`, `limit` |
 | GET    | `/health`                         | Health check                   | —                                 |
 | GET    | `/status`                         | Synchronization status         | —                                 |
-| GET    | `/metrics`                        | Prometheus metrics             | —                                 |
 
 ## Score Calculation
 

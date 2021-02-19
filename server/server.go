@@ -6,20 +6,23 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/figment-networks/filecoin-indexer/client"
+	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
 // Server handles HTTP requests
 type Server struct {
 	engine *gin.Engine
+	cfg    *config.Config
 	store  *store.Store
 	client *client.Client
 }
 
 // New creates an HTTP server
-func New(store *store.Store, client *client.Client) *Server {
+func New(cfg *config.Config, store *store.Store, client *client.Client) (*Server, error) {
 	server := Server{
 		engine: gin.Default(),
+		cfg:    cfg,
 		store:  store,
 		client: client,
 	}
@@ -27,11 +30,16 @@ func New(store *store.Store, client *client.Client) *Server {
 	server.setMiddleware()
 	server.setRoutes()
 
-	return &server
+	err := server.initMetrics()
+	if err != nil {
+		return nil, err
+	}
+
+	return &server, nil
 }
 
 func (s *Server) setMiddleware() {
-	s.engine.Use(MetricsMiddleware())
+	s.engine.Use(MetricsMiddleware(s.cfg))
 	s.engine.Use(RollbarMiddleware())
 }
 
@@ -48,8 +56,7 @@ func (s *Server) setRoutes() {
 	s.engine.GET("/events", s.GetEvents)
 }
 
-// Start runs the server
-func (s *Server) Start(listenAddr string) error {
+func (s *Server) initMetrics() error {
 	prom := prometheusmetrics.New()
 
 	err := metrics.AddEngine(prom)
@@ -62,7 +69,12 @@ func (s *Server) Start(listenAddr string) error {
 		return err
 	}
 
-	s.engine.GET("/metrics", gin.WrapH(metrics.Handler()))
+	s.engine.GET(s.cfg.MetricsPath, gin.WrapH(metrics.Handler()))
 
-	return s.engine.Run(listenAddr)
+	return nil
+}
+
+// Start runs the server
+func (s *Server) Start() error {
+	return s.engine.Run(s.cfg.ServerListenAddr())
 }

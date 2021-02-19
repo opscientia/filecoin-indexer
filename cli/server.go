@@ -24,7 +24,10 @@ func runServer(cfg *config.Config) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	server := server.New(store, client)
+	server, err := server.New(cfg, store, client)
+	if err != nil {
+		return err
+	}
 
-	return server.Start(cfg.ListenAddr())
+	return server.Start()
 }
