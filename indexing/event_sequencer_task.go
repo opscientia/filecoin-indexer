@@ -6,7 +6,6 @@ import (
 
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/stew/slice"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -48,11 +47,6 @@ func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error 
 		return err
 	}
 
-	err = t.fetchDealIDs(payload)
-	if err != nil {
-		return err
-	}
-
 	err = t.fetchSlashedDealIDs(payload)
 	if err != nil {
 		return err
@@ -60,7 +54,6 @@ func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error 
 
 	t.trackStorageCapacityChanges(payload)
 	t.trackSectorFaults(payload)
-	t.trackNewDeals(payload)
 	t.trackSlashedDeals(payload)
 
 	return nil
@@ -77,17 +70,6 @@ func (t *EventSequencerTask) fetchMinersAtPreviousHeight(p *payload) error {
 	for _, miner := range miners {
 		p.StoredMiners[miner.Address] = miner
 	}
-
-	return nil
-}
-
-func (t *EventSequencerTask) fetchDealIDs(p *payload) error {
-	dealIDs, err := t.store.Event.DealIDsByKind(types.NewDealEvent)
-	if err != nil {
-		return err
-	}
-
-	p.StoredDealIDs = dealIDs
 
 	return nil
 }
@@ -166,46 +148,17 @@ func (t *EventSequencerTask) trackSectorFaults(p *payload) {
 	}
 }
 
-func (t *EventSequencerTask) trackNewDeals(p *payload) {
-	for dealID, deal := range p.DealsData {
-		if deal.State.SectorStartEpoch == -1 {
-			continue
-		}
-
-		if slice.Contains(p.StoredDealIDs, dealID) {
-			continue
-		}
-
-		event := model.Event{
-			Height:       &p.currentHeight,
-			MinerAddress: deal.Proposal.Provider.String(),
-			Kind:         types.NewDealEvent,
-
-			Data: map[string]interface{}{
-				"deal_id":        dealID,
-				"client_address": deal.Proposal.Client.String(),
-				"piece_size":     strconv.FormatUint(uint64(deal.Proposal.PieceSize), 10),
-				"storage_price":  decimal.NewFromBigInt(deal.Proposal.StoragePricePerEpoch.Int, -18),
-				"is_verified":    deal.Proposal.VerifiedDeal,
-			},
-		}
-
-		p.Events = append(p.Events, &event)
-	}
-}
-
 func (t *EventSequencerTask) trackSlashedDeals(p *payload) {
-	for dealID, deal := range p.DealsData {
-		if deal.State.SlashEpoch == -1 {
-			continue
-		}
-
+	for _, dealID := range p.DealsSlashedIDs {
 		if slice.Contains(p.StoredSlashedDealIDs, dealID) {
 			continue
 		}
 
+		deal := p.DealsData[dealID]
+		slashEpoch := int64(deal.State.SlashEpoch)
+
 		event := model.Event{
-			Height:       &p.currentHeight,
+			Height:       &slashEpoch,
 			MinerAddress: deal.Proposal.Provider.String(),
 			Kind:         types.SlashedDealEvent,
 

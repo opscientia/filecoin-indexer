@@ -7,9 +7,6 @@ const (
 	// StorageCapacityChangeEvent represents a change of miner's storage capacity
 	StorageCapacityChangeEvent EventKind = "storage_capacity_change"
 
-	// NewDealEvent represents the act of signing a new deal by a miner
-	NewDealEvent EventKind = "new_deal"
-
 	// SlashedDealEvent represents a slash of a miner's deal
 	SlashedDealEvent EventKind = "slashed_deal"
 

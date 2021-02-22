@@ -49,13 +49,14 @@ func (t *DealFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload.DealsCount = make(map[address.Address]uint32)
 	payload.DealsSlashedCount = make(map[address.Address]uint32)
 
-	for _, deal := range deals {
+	for dealID, deal := range deals {
 		minerAddress := deal.Proposal.Provider
 
 		payload.DealsCount[minerAddress]++
 
 		if deal.State.SlashEpoch != -1 {
 			payload.DealsSlashedCount[minerAddress]++
+			payload.DealsSlashedIDs = append(payload.DealsSlashedIDs, dealID)
 		}
 	}
 

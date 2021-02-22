@@ -45,6 +45,7 @@ type payload struct {
 	DealsData            map[string]api.MarketDeal
 	DealsCount           map[address.Address]uint32
 	DealsSlashedCount    map[address.Address]uint32
+	DealsSlashedIDs      []string
 	MinersAddresses      []address.Address
 	MinersInfo           []*miner.MinerInfo
 	MinersPower          []*api.MinerPower
@@ -60,7 +61,6 @@ type payload struct {
 
 	// Sequencer stage
 	StoredMiners         map[string]model.Miner
-	StoredDealIDs        []string
 	StoredSlashedDealIDs []string
 }
 
