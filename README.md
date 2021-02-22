@@ -37,7 +37,8 @@ Available commands:
 |------------|-----------------------------------------------|
 | `migrate`  | Migrates the database                         |
 | `rollback` | Rolls the schema back to the previous version |
-| `sync`     | Runs the synchronization process              |
+| `sync`     | Runs a one-time synchronization job           |
+| `worker`   | Starts the synchronization worker             |
 | `server`   | Starts the API server                         |
 
 ## Configuration
@@ -57,6 +58,7 @@ Example:
   "server_port": 8080,
   "initial_height": 0,
   "batch_size": 100,
+  "sync_interval": "1s",
   "metrics_addr": "127.0.0.1",
   "metrics_port": "8090",
   "metrics_path": "/metrics",
@@ -68,22 +70,23 @@ Example:
 
 ### Environment variables
 
-| Name                  | Description               | Default Value | Required |
-|-----------------------|---------------------------|---------------|----------|
-| `APP_ENV`             | Application environment   | `development` | Yes      |
-| `RPC_ENDPOINT`        | Lotus RPC endpoint        | —             | Yes      |
-| `RPC_TIMEOUT`         | RPC client timeout        | `30s`         | No       |
-| `DATABASE_DSN`        | PostgreSQL database URL   | —             | Yes      |
-| `SERVER_ADDR`         | HTTP server address       | `0.0.0.0`     | No       |
-| `SERVER_PORT`         | HTTP server port          | `8080`        | No       |
-| `INITIAL_HEIGHT`      | Initial sync height       | `0`           | No       |
-| `BATCH_SIZE`          | Limit of heights per sync | —             | No       |
-| `METRICS_ADDR`        | Metrics server address    | `127.0.0.1`   | No       |
-| `METRICS_PORT`        | Metrics server port       | `8090`        | No       |
-| `METRICS_PATH`        | Metrics endpoint path     | `/metrics`    | No       |
-| `ROLLBAR_TOKEN`       | Rollbar token             | —             | No       |
-| `ROLLBAR_SERVER_ROOT` | Rollbar server root       | —             | No       |
-| `DEBUG`               | Debug mode                | `false`       | No       |
+| Name                  | Description                | Default Value | Required |
+|-----------------------|----------------------------|---------------|----------|
+| `APP_ENV`             | Application environment    | `development` | Yes      |
+| `RPC_ENDPOINT`        | Lotus RPC endpoint         | —             | Yes      |
+| `RPC_TIMEOUT`         | RPC client timeout         | `30s`         | No       |
+| `DATABASE_DSN`        | PostgreSQL database URL    | —             | Yes      |
+| `SERVER_ADDR`         | HTTP server address        | `0.0.0.0`     | No       |
+| `SERVER_PORT`         | HTTP server port           | `8080`        | No       |
+| `INITIAL_HEIGHT`      | Initial sync height        | `0`           | No       |
+| `BATCH_SIZE`          | Limit of heights per sync  | —             | No       |
+| `SYNC_INTERVAL`       | Interval between sync jobs | `1s`          | No       |
+| `METRICS_ADDR`        | Metrics server address     | `127.0.0.1`   | No       |
+| `METRICS_PORT`        | Metrics server port        | `8090`        | No       |
+| `METRICS_PATH`        | Metrics endpoint path      | `/metrics`    | No       |
+| `ROLLBAR_TOKEN`       | Rollbar token              | —             | No       |
+| `ROLLBAR_SERVER_ROOT` | Rollbar server root        | —             | No       |
+| `DEBUG`               | Debug mode                 | `false`       | No       |
 
 ## Running Application
 

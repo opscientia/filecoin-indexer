@@ -44,6 +44,8 @@ func runCommand(cfg *config.Config, name string) error {
 		return runMigrations(cfg, name)
 	case "sync":
 		return runSync(cfg)
+	case "worker":
+		return runWorker(cfg)
 	case "server":
 		return runServer(cfg)
 	default:
@@ -90,5 +92,5 @@ func initStore(cfg *config.Config) (*store.Store, error) {
 }
 
 func initClient(cfg *config.Config) (*client.Client, error) {
-	return client.New(cfg.RPCEndpoint, cfg.ClientTimeout())
+	return client.New(cfg.RPCEndpoint, cfg.ClientRPCTimeout())
 }

@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	errEndpointRequired  = errors.New("RPC endpoint is required")
-	errDatabaseRequired  = errors.New("database credentials are required")
-	errRPCTimeoutInvalid = errors.New("RPC timeout is invalid")
+	errEndpointRequired    = errors.New("RPC endpoint is required")
+	errDatabaseRequired    = errors.New("database credentials are required")
+	errRPCTimeoutInvalid   = errors.New("RPC timeout is invalid")
+	errSyncIntervalInvalid = errors.New("sync interval is invalid")
 )
 
 // Config holds the configuration data
@@ -26,6 +27,7 @@ type Config struct {
 	ServerPort        uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
 	InitialHeight     int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
 	BatchSize         int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
+	SyncInterval      string `json:"sync_interval" envconfig:"SYNC_INTERVAL" default:"1s"`
 	MetricsAddr       string `json:"metrics_addr" envconfig:"METRICS_ADDR" default:"127.0.0.1"`
 	MetricsPort       uint16 `json:"metrics_port" envconfig:"METRICS_PORT" default:"8090"`
 	MetricsPath       string `json:"metrics_path" envconfig:"METRICS_PATH" default:"/metrics"`
@@ -33,7 +35,8 @@ type Config struct {
 	RollbarServerRoot string `json:"rollbar_server_root" envconfig:"ROLLBAR_SERVER_ROOT"`
 	Debug             bool   `json:"debug" envconfig:"DEBUG"`
 
-	rpcTimeout time.Duration
+	rpcTimeout   time.Duration
+	syncInterval time.Duration
 }
 
 // New creates a new configuration
@@ -72,6 +75,12 @@ func (c *Config) Validate() error {
 	}
 	c.rpcTimeout = d
 
+	d, err = time.ParseDuration(c.SyncInterval)
+	if err != nil {
+		return errSyncIntervalInvalid
+	}
+	c.syncInterval = d
+
 	return nil
 }
 
@@ -89,7 +98,12 @@ func listenAddr(addr string, port uint16) string {
 	return fmt.Sprintf("%s:%d", addr, port)
 }
 
-// ClientTimeout returns the timeout for the RPC client
-func (c *Config) ClientTimeout() time.Duration {
+// ClientRPCTimeout returns the timeout for the RPC client
+func (c *Config) ClientRPCTimeout() time.Duration {
 	return c.rpcTimeout
+}
+
+// PipelineSyncInterval returns the interval between synchronization jobs
+func (c *Config) PipelineSyncInterval() time.Duration {
+	return c.syncInterval
 }
