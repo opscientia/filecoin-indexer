@@ -7,7 +7,7 @@ import (
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
 
 	"github.com/figment-networks/filecoin-indexer/config"
-	"github.com/figment-networks/filecoin-indexer/indexing"
+	"github.com/figment-networks/filecoin-indexer/pipeline"
 )
 
 func runSync(cfg *config.Config) error {
@@ -28,7 +28,7 @@ func runSync(cfg *config.Config) error {
 		return err
 	}
 
-	return indexing.StartPipeline(cfg, client, store)
+	return pipeline.StartPipeline(cfg, client, store)
 }
 
 func initMetrics(cfg *config.Config) error {

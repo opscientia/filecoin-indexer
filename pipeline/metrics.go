@@ -1,4 +1,4 @@
-package indexing
+package pipeline
 
 import "github.com/figment-networks/indexing-engine/metrics"
 
