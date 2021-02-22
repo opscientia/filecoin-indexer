@@ -132,12 +132,12 @@ Where:
 
 ### Variables
 
-| Name        | Description                                                      | Weight |
-|-------------|------------------------------------------------------------------|--------|
-| Slashes     | Reciprocal of the number of miner's deals that have been slashed | 100    |
-| Faults      | Reciprocal of the total number of miner's faults                 | 100    |
-| Power       | Miner's quality-adjusted power divided by network power          | 100    |
-| Sector Size | Miner's sector size divided by 32 GiB                            | 10     |
+| Name        | Description                                       | Weight |
+|-------------|---------------------------------------------------|--------|
+| Slashes     | Reciprocal of the number of slashed deals squared | 100    |
+| Faults      | Reciprocal of the total number of faults          | 100    |
+| Power       | Quality-adjusted power divided by network power   | 100    |
+| Sector Size | Sector size divided by 32 GiB                     | 10     |
 
 ## License
 

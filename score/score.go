@@ -24,7 +24,7 @@ const (
 
 // CalculateScore computes a miner score based on a set of variables
 func CalculateScore(vars Variables) uint32 {
-	slashingsScore := 1 / (1 + math.Pow(2, float64(vars.SlashedDealsCount)))
+	slashingsScore := 1 / (1 + math.Pow(float64(vars.SlashedDealsCount), 2))
 	faultsScore := 1 / (1 + float64(vars.FaultsCount))
 	powerScore := vars.RelativePower / relativePowerBaseline
 	sectorSizeScore := vars.SectorSize / sectorSizeBaseline
