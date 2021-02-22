@@ -20,5 +20,5 @@ require (
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	gorm.io/driver/postgres v1.0.5
-	gorm.io/gorm v1.20.5
+	gorm.io/gorm v1.20.12
 )

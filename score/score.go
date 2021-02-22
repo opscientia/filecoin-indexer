@@ -1,5 +1,7 @@
 package score
 
+import "math"
+
 // Variables are input parameters for the score calculation
 type Variables struct {
 	SlashedDealsCount uint32
@@ -22,8 +24,8 @@ const (
 
 // CalculateScore computes a miner score based on a set of variables
 func CalculateScore(vars Variables) uint32 {
-	slashingsScore := 1 / (1 + float32(vars.SlashedDealsCount))
-	faultsScore := 1 / (1 + float32(vars.FaultsCount))
+	slashingsScore := 1 / (1 + math.Pow(2, float64(vars.SlashedDealsCount)))
+	faultsScore := 1 / (1 + float64(vars.FaultsCount))
 	powerScore := vars.RelativePower / relativePowerBaseline
 	sectorSizeScore := vars.SectorSize / sectorSizeBaseline
 

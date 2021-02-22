@@ -22,6 +22,7 @@ type Store struct {
 // New creates a store from the connection string
 func New(connStr string, logMode logger.LogLevel) (*Store, error) {
 	config := gorm.Config{
+		CreateBatchSize:        1000,
 		SkipDefaultTransaction: true,
 
 		Logger: logger.Default.LogMode(logMode),
