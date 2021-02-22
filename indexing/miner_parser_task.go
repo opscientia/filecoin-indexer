@@ -50,20 +50,8 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		}
 		faultsCount := uint32(fc)
 
-		var dealsCount uint32
-		var slashedDealsCount uint32
-
-		for _, deal := range payload.DealsData {
-			if deal.Proposal.Provider == address {
-				if deal.State.SectorStartEpoch != -1 {
-					dealsCount++
-
-					if deal.State.SlashEpoch != -1 {
-						slashedDealsCount++
-					}
-				}
-			}
-		}
+		dealsCount := payload.DealsCount[address]
+		slashedDealsCount := payload.DealsSlashedCount[address]
 
 		score := score.CalculateScore(score.Variables{
 			SectorSize:        sectorSize,

@@ -41,13 +41,7 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	defer timer.ObserveDuration()
 
 	payload := p.(*payload)
-	tsk := payload.EpochTipset.Key()
-
-	addresses, err := t.client.Miner.GetAddressesByTipset(tsk)
-	if err != nil {
-		return err
-	}
-	payload.MinersAddresses = addresses
+	addresses := payload.MinersAddresses
 
 	payload.MinersInfo = make([]*miner.MinerInfo, len(addresses))
 	payload.MinersPower = make([]*api.MinerPower, len(addresses))

@@ -5,6 +5,7 @@ import (
 
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/filecoin-project/go-address"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 )
@@ -43,8 +44,24 @@ func (t *DealFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	if err != nil {
 		return err
 	}
-
 	payload.DealsData = deals
+
+	payload.DealsCount = make(map[address.Address]uint32)
+	payload.DealsSlashedCount = make(map[address.Address]uint32)
+
+	for _, deal := range deals {
+		minerAddress := deal.Proposal.Provider
+
+		payload.DealsCount[minerAddress]++
+
+		if deal.State.SlashEpoch != -1 {
+			payload.DealsSlashedCount[minerAddress]++
+		}
+	}
+
+	for address := range payload.DealsCount {
+		payload.MinersAddresses = append(payload.MinersAddresses, address)
+	}
 
 	return nil
 }
