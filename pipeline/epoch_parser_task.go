@@ -3,25 +3,20 @@ package pipeline
 import (
 	"context"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 
 	"github.com/figment-networks/filecoin-indexer/model"
 )
 
 // EpochParserTask transforms raw epoch data
-type EpochParserTask struct {
-	observer metrics.Observer
-}
+type EpochParserTask struct{}
 
 // EpochParserTaskName represents the name of the task
 const EpochParserTaskName = "EpochParser"
 
 // NewEpochParserTask creates the task
 func NewEpochParserTask() pipeline.Task {
-	return &EpochParserTask{
-		observer: pipelineTaskDuration.WithLabels(EpochParserTaskName),
-	}
+	return &EpochParserTask{}
 }
 
 // GetName returns the task name
@@ -31,9 +26,6 @@ func (t *EpochParserTask) GetName() string {
 
 // Run performs the task
 func (t *EpochParserTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	payload := p.(*payload)
 	epochHeight := int64(payload.EpochTipset.Height())
 

@@ -3,7 +3,6 @@ package pipeline
 import (
 	"context"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 
 	"github.com/figment-networks/filecoin-indexer/store"
@@ -11,8 +10,7 @@ import (
 
 // BeginTransactionTask starts a database transaction
 type BeginTransactionTask struct {
-	store    *store.Store
-	observer metrics.Observer
+	store *store.Store
 }
 
 // BeginTransactionTaskName represents the name of the task
@@ -20,10 +18,7 @@ const BeginTransactionTaskName = "BeginTransaction"
 
 // NewBeginTransactionTask creates the task
 func NewBeginTransactionTask(store *store.Store) pipeline.Task {
-	return &BeginTransactionTask{
-		store:    store,
-		observer: pipelineTaskDuration.WithLabels(BeginTransactionTaskName),
-	}
+	return &BeginTransactionTask{store: store}
 }
 
 // GetName returns the task name
@@ -33,9 +28,6 @@ func (t *BeginTransactionTask) GetName() string {
 
 // Run performs the task
 func (t *BeginTransactionTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	err := t.store.Begin()
 	if err != nil {
 		return err

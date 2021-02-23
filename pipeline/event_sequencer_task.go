@@ -4,7 +4,6 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/stretchr/stew/slice"
 
@@ -15,8 +14,7 @@ import (
 
 // EventSequencerTask creates network events
 type EventSequencerTask struct {
-	store    *store.Store
-	observer metrics.Observer
+	store *store.Store
 }
 
 // EventSequencerTaskName represents the name of the task
@@ -24,10 +22,7 @@ const EventSequencerTaskName = "EventSequencer"
 
 // NewEventSequencerTask creates the task
 func NewEventSequencerTask(store *store.Store) pipeline.Task {
-	return &EventSequencerTask{
-		store:    store,
-		observer: pipelineTaskDuration.WithLabels(EventSequencerTaskName),
-	}
+	return &EventSequencerTask{store: store}
 }
 
 // GetName returns the task name
@@ -37,9 +32,6 @@ func (t *EventSequencerTask) GetName() string {
 
 // Run performs the task
 func (t *EventSequencerTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	payload := p.(*payload)
 
 	err := t.fetchMinersAtPreviousHeight(payload)

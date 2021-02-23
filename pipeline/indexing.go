@@ -47,13 +47,10 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 	)
 
 	sink := NewSink(store)
-	errorCounter := pipelineErrorsTotal.WithLabels()
 
 	err = p.Start(context.Background(), source, sink, &pipeline.Options{})
 	if err != nil {
 		store.Rollback()
-
-		errorCounter.Inc()
 
 		rollbar.Error(err)
 		rollbar.Wait()

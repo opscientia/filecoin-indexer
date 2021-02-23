@@ -3,7 +3,6 @@ package pipeline
 import (
 	"context"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
 
@@ -12,8 +11,7 @@ import (
 
 // DealFetcherTask fetches raw deal data
 type DealFetcherTask struct {
-	client   *client.Client
-	observer metrics.Observer
+	client *client.Client
 }
 
 // DealFetcherTaskName represents the name of the task
@@ -21,10 +19,7 @@ const DealFetcherTaskName = "DealFetcher"
 
 // NewDealFetcherTask creates the task
 func NewDealFetcherTask(client *client.Client) pipeline.Task {
-	return &DealFetcherTask{
-		client:   client,
-		observer: pipelineTaskDuration.WithLabels(DealFetcherTaskName),
-	}
+	return &DealFetcherTask{client: client}
 }
 
 // GetName returns the task name
@@ -34,9 +29,6 @@ func (t *DealFetcherTask) GetName() string {
 
 // Run performs the task
 func (t *DealFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	payload := p.(*payload)
 	tsk := payload.EpochTipset.Key()
 

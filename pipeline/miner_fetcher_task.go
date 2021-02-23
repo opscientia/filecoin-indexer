@@ -3,7 +3,6 @@ package pipeline
 import (
 	"context"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
@@ -15,8 +14,7 @@ import (
 
 // MinerFetcherTask fetches raw miner data
 type MinerFetcherTask struct {
-	client   *client.Client
-	observer metrics.Observer
+	client *client.Client
 }
 
 // MinerFetcherTaskName represents the name of the task
@@ -24,10 +22,7 @@ const MinerFetcherTaskName = "MinerFetcher"
 
 // NewMinerFetcherTask creates the task
 func NewMinerFetcherTask(client *client.Client) pipeline.Task {
-	return &MinerFetcherTask{
-		client:   client,
-		observer: pipelineTaskDuration.WithLabels(MinerFetcherTaskName),
-	}
+	return &MinerFetcherTask{client: client}
 }
 
 // GetName returns the task name
@@ -37,9 +32,6 @@ func (t *MinerFetcherTask) GetName() string {
 
 // Run performs the task
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	payload := p.(*payload)
 	addresses := payload.MinersAddresses
 

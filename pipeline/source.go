@@ -63,6 +63,10 @@ func (s *source) Next(context.Context, pipeline.Payload) bool {
 	return false
 }
 
+func (s *source) Skip(stageName pipeline.StageName) bool {
+	return false
+}
+
 func (s *source) Err() error {
 	return s.err
 }

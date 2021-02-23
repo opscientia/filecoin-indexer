@@ -3,7 +3,6 @@ package pipeline
 import (
 	"context"
 
-	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/specs-actors/v2/actors/builtin"
@@ -13,18 +12,14 @@ import (
 )
 
 // TransactionParserTask transforms raw transaction data
-type TransactionParserTask struct {
-	observer metrics.Observer
-}
+type TransactionParserTask struct{}
 
 // TransactionParserTaskName represents the name of the task
 const TransactionParserTaskName = "TransactionParser"
 
 // NewTransactionParserTask creates the task
 func NewTransactionParserTask() pipeline.Task {
-	return &TransactionParserTask{
-		observer: pipelineTaskDuration.WithLabels(TransactionParserTaskName),
-	}
+	return &TransactionParserTask{}
 }
 
 // GetName returns the task name
@@ -34,9 +29,6 @@ func (t *TransactionParserTask) GetName() string {
 
 // Run performs the task
 func (t *TransactionParserTask) Run(ctx context.Context, p pipeline.Payload) error {
-	timer := metrics.NewTimer(t.observer)
-	defer timer.ObserveDuration()
-
 	payload := p.(*payload)
 
 	for i, msg := range payload.TransactionsMessages {
