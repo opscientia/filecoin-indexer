@@ -33,8 +33,10 @@ func runWorker(cfg *config.Config) error {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
+	interval := cfg.PipelineSyncInterval()
+	ticker := time.NewTicker(interval)
+
 	ctx, cancel := context.WithCancel(context.Background())
-	ticker := time.NewTicker(cfg.PipelineSyncInterval())
 
 	go func() {
 		defer wg.Done()
@@ -43,7 +45,9 @@ func runWorker(cfg *config.Config) error {
 		for {
 			select {
 			case <-ticker.C:
+				ticker.Stop()
 				pipeline.StartPipeline(cfg, client, store)
+				ticker.Reset(interval)
 			case <-ctx.Done():
 				return
 			}
