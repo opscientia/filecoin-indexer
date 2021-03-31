@@ -4,7 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 
+	"github.com/figment-networks/indexing-engine/metrics"
+	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
 	"gorm.io/gorm/logger"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -93,4 +96,34 @@ func initStore(cfg *config.Config) (*store.Store, error) {
 
 func initClient(cfg *config.Config) (*client.Client, error) {
 	return client.New(cfg.RPCEndpoint, cfg.ClientRPCTimeout())
+}
+
+func initMetrics(cfg *config.Config) error {
+	prom := prometheusmetrics.New()
+
+	err := metrics.AddEngine(prom)
+	if err != nil {
+		return err
+	}
+
+	err = metrics.Hotload(prom.Name())
+	if err != nil {
+		return err
+	}
+
+	server := &http.Server{
+		Addr:    cfg.MetricsListenAddr(),
+		Handler: metrics.Handler(),
+	}
+
+	go func() {
+		defer config.LogPanic()
+
+		err := server.ListenAndServe()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	return nil
 }

@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"context"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
+
+	"github.com/rollbar/rollbar-go"
 
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/pipeline"
@@ -30,41 +30,26 @@ func runWorker(cfg *config.Config) error {
 		return err
 	}
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
 	interval := cfg.PipelineSyncInterval()
 	ticker := time.NewTicker(interval)
 
-	ctx, cancel := context.WithCancel(context.Background())
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		defer wg.Done()
-		defer config.LogPanic()
+	for {
+		select {
+		case <-ticker.C:
+			ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				ticker.Stop()
-				pipeline.StartPipeline(cfg, client, store)
-				ticker.Reset(interval)
-			case <-ctx.Done():
-				return
+			err := pipeline.StartPipeline(cfg, client, store)
+			if err != nil {
+				rollbar.Error(err)
+				rollbar.Wait()
 			}
+
+			ticker.Reset(interval)
+		case <-interrupt:
+			return nil
 		}
-	}()
-
-	<-interrupt()
-
-	ticker.Stop()
-	cancel()
-	wg.Wait()
-
-	return nil
-}
-
-func interrupt() chan os.Signal {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	return c
+	}
 }
