@@ -18,8 +18,8 @@ type Server struct {
 	client *client.Client
 }
 
-// New creates an HTTP server
-func New(cfg *config.Config, store *store.Store, client *client.Client) (*Server, error) {
+// NewServer creates an HTTP server
+func NewServer(cfg *config.Config, store *store.Store, client *client.Client) (*Server, error) {
 	server := Server{
 		engine: gin.Default(),
 		cfg:    cfg,

@@ -19,8 +19,8 @@ type Store struct {
 	Event       eventStore
 }
 
-// New creates a store from the connection string
-func New(connStr string, logMode logger.LogLevel) (*Store, error) {
+// NewStore creates a store from the connection string
+func NewStore(connStr string, logMode logger.LogLevel) (*Store, error) {
 	config := gorm.Config{
 		CreateBatchSize:        1000,
 		SkipDefaultTransaction: true,

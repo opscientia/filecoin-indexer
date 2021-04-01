@@ -21,8 +21,8 @@ type Client struct {
 	Account     accountClient
 }
 
-// New creates a JSON RPC client
-func New(endpoint string, timeout time.Duration) (*Client, error) {
+// NewClient creates a JSON RPC client
+func NewClient(endpoint string, timeout time.Duration) (*Client, error) {
 	var api apistruct.FullNodeStruct
 
 	ctx := context.Background()

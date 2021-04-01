@@ -39,8 +39,8 @@ type Config struct {
 	syncInterval time.Duration
 }
 
-// New creates a new configuration
-func New() *Config {
+// NewConfig creates a new configuration
+func NewConfig() *Config {
 	return &Config{}
 }
 
