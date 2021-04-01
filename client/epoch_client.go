@@ -12,8 +12,8 @@ type epochClient struct {
 	api *apistruct.FullNodeStruct
 }
 
-// GetCurrentHeight fetches the height of the current epoch
-func (ec *epochClient) GetCurrentHeight() (int64, error) {
+// GetLatestHeight fetches the height of the current epoch
+func (ec *epochClient) GetLatestHeight() (int64, error) {
 	tipset, err := ec.api.ChainHead(context.Background())
 	if err != nil {
 		return 0, err

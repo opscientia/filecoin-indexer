@@ -13,7 +13,6 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/ipfs/go-cid v0.0.7
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/pressly/goose v2.6.0+incompatible
 	github.com/rollbar/rollbar-go v1.2.0
 	github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc

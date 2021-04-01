@@ -13,7 +13,7 @@ func (s *Server) GetHealth(c *gin.Context) {
 		return
 	}
 
-	if _, err := s.client.Epoch.GetCurrentHeight(); err != nil {
+	if _, err := s.client.Epoch.GetLatestHeight(); err != nil {
 		serverError(c, err)
 		return
 	}
@@ -23,13 +23,13 @@ func (s *Server) GetHealth(c *gin.Context) {
 
 // GetStatus returns the synchronization status
 func (s *Server) GetStatus(c *gin.Context) {
-	lastSyncedEpoch, err := s.store.Epoch.LastHeight()
+	currentEpoch, err := s.client.Epoch.GetLatestHeight()
 	if err != nil {
 		serverError(c, err)
 		return
 	}
 
-	currentEpoch, err := s.client.Epoch.GetCurrentHeight()
+	lastSyncedEpoch, err := s.store.Epoch.LastHeight()
 	if err != nil {
 		serverError(c, err)
 		return

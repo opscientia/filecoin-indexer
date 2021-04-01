@@ -21,7 +21,7 @@ func (es *epochStore) Create(epoch *model.Epoch) error {
 	return es.db.Create(epoch).Error
 }
 
-// LastHeight returns the most recent height
+// LastHeight returns the last indexed height
 func (es *epochStore) LastHeight() (int64, error) {
 	var result int64
 

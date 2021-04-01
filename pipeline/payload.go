@@ -19,13 +19,13 @@ var (
 	_ pipeline.Payload        = (*payload)(nil)
 )
 
+// PayloadFactory creates payloads
+type PayloadFactory struct{}
+
 // NewPayloadFactory creates a payload factory
 func NewPayloadFactory() *PayloadFactory {
 	return &PayloadFactory{}
 }
-
-// PayloadFactory creates payloads
-type PayloadFactory struct{}
 
 // GetPayload returns a payload for a given height
 func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
