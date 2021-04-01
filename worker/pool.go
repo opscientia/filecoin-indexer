@@ -17,7 +17,7 @@ func (p *Pool) AddWorker(worker *PoolWorker) {
 }
 
 // Run starts the worker pool
-func (p *Pool) Run(handler ClientHandler) {
+func (p *Pool) Run(handler ResponseHandler) {
 	for _, worker := range p.workers {
 		go worker.Run(handler, &p.wg)
 	}

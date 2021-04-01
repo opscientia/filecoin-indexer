@@ -16,7 +16,7 @@ func NewLoop(server Server) *Loop {
 }
 
 // Run starts the worker loop
-func (l *Loop) Run(handler ServerHandler) {
+func (l *Loop) Run(handler RequestHandler) {
 	for {
 		var req Request
 
@@ -28,7 +28,7 @@ func (l *Loop) Run(handler ServerHandler) {
 			panic(err)
 		}
 
-		err = handler(req.Height)
+		err = handler(req)
 
 		var msg string
 		if err != nil {

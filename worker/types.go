@@ -1,6 +1,6 @@
 package worker
 
-// Request respresents a worker request
+// Request respresents a manager request
 type Request struct {
 	Height int64
 }
@@ -25,8 +25,8 @@ type Server interface {
 	Send(Response) error
 }
 
-// ServerHandler handles a request from a manager
-type ServerHandler func(height int64) error
+// RequestHandler handles a request from a manager
+type RequestHandler func(Request) error
 
-// ClientHandler handles a response from a worker
-type ClientHandler func(height int64, err error)
+// ResponseHandler handles a response from a worker
+type ResponseHandler func(Response)

@@ -1,9 +1,6 @@
 package worker
 
-import (
-	"errors"
-	"sync"
-)
+import "sync"
 
 // PoolWorker represents a pool worker
 type PoolWorker struct {
@@ -20,7 +17,7 @@ func NewPoolWorker(client Client) *PoolWorker {
 }
 
 // Run starts the pool worker
-func (pw *PoolWorker) Run(handler ClientHandler, wg *sync.WaitGroup) {
+func (pw *PoolWorker) Run(handler ResponseHandler, wg *sync.WaitGroup) {
 	for height := range pw.channel {
 		pw.Process(height, handler)
 
@@ -31,7 +28,7 @@ func (pw *PoolWorker) Run(handler ClientHandler, wg *sync.WaitGroup) {
 }
 
 // Process handles the processing of a given height
-func (pw *PoolWorker) Process(height int64, handler ClientHandler) {
+func (pw *PoolWorker) Process(height int64, handler ResponseHandler) {
 	err := pw.client.Send(Request{Height: height})
 	if err != nil {
 		panic(err)
@@ -44,11 +41,7 @@ func (pw *PoolWorker) Process(height int64, handler ClientHandler) {
 		panic(err)
 	}
 
-	if res.Success {
-		handler(res.Height, nil)
-	} else {
-		handler(res.Height, errors.New(res.Error))
-	}
+	handler(res)
 }
 
 // Stop stops the pool worker
