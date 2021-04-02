@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+const createBatchSize = 1000
+
 // Store handles database operations
 type Store struct {
 	db *gorm.DB
@@ -17,15 +19,16 @@ type Store struct {
 	Miner       minerStore
 	Transaction transactionStore
 	Event       eventStore
+	Job         jobStore
 }
 
 // NewStore creates a store from the connection string
 func NewStore(connStr string, logMode logger.LogLevel) (*Store, error) {
-	config := gorm.Config{
-		CreateBatchSize:        1000,
-		SkipDefaultTransaction: true,
+	logger := logger.Default.LogMode(logMode)
 
-		Logger: logger.Default.LogMode(logMode),
+	config := gorm.Config{
+		CreateBatchSize: createBatchSize,
+		Logger:          logger,
 	}
 
 	db, err := gorm.Open(postgres.Open(connStr), &config)
@@ -53,25 +56,13 @@ func (s *Store) Test() error {
 	return db.Ping()
 }
 
-// DatabaseSize returns the size of the database
-func (s *Store) DatabaseSize() (int64, error) {
-	var result int64
-
-	err := s.tx.
-		Raw("SELECT pg_database_size(current_database())").
-		Scan(&result).
-		Error
-
-	if err != nil {
-		return 0, err
-	}
-
-	return result, nil
-}
-
 // Begin starts a database transaction
 func (s *Store) Begin() error {
-	tx := s.db.Begin()
+	config := gorm.Session{
+		SkipDefaultTransaction: true,
+	}
+
+	tx := s.db.Session(&config).Begin()
 	if tx.Error != nil {
 		return tx.Error
 	}
@@ -103,6 +94,22 @@ func (s *Store) Rollback() error {
 	return nil
 }
 
+// DatabaseSize returns the size of the database
+func (s *Store) DatabaseSize() (int64, error) {
+	var result int64
+
+	err := s.tx.
+		Raw("SELECT pg_database_size(current_database())").
+		Scan(&result).
+		Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return result, nil
+}
+
 // Close closes the database connection
 func (s *Store) Close() error {
 	conn, err := s.Conn()
@@ -120,6 +127,8 @@ func (s *Store) setTransaction(tx *gorm.DB) *Store {
 	s.Miner = minerStore{db: tx}
 	s.Transaction = transactionStore{db: tx}
 	s.Event = eventStore{db: tx}
+
+	s.Job = jobStore{db: s.db}
 
 	return s
 }
