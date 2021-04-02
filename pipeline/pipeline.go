@@ -10,8 +10,27 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-// StartPipeline runs the indexing pipeline
-func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store) error {
+// RunFetcherPipeline runs the fetching pipeline
+func RunFetcherPipeline(height int64, client *client.Client) error {
+	p := pipeline.NewDefault(NewPayloadFactory())
+
+	p.SetTasks(pipeline.StageFetcher,
+		NewEpochFetcherTask(client),
+		NewDealFetcherTask(client),
+		NewMinerFetcherTask(client),
+		NewTransactionFetcherTask(client),
+	)
+
+	_, err := p.Run(context.Background(), height, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// StartIndexerPipeline starts the indexing pipeline
+func StartIndexerPipeline(cfg *config.Config, client *client.Client, store *store.Store) error {
 	source, err := NewSource(cfg, client, store)
 	if err != nil {
 		return err
@@ -47,7 +66,7 @@ func StartPipeline(cfg *config.Config, client *client.Client, store *store.Store
 
 	sink := NewSink(store)
 
-	err = p.Start(context.Background(), source, sink, &pipeline.Options{})
+	err = p.Start(context.Background(), source, sink, nil)
 	if err != nil {
 		store.Rollback()
 
