@@ -1,6 +1,10 @@
 package worker
 
-import "golang.org/x/net/websocket"
+import (
+	"strings"
+
+	"golang.org/x/net/websocket"
+)
 
 // WebsocketClient interacts with a worker using a websocket
 type WebsocketClient struct {
@@ -10,7 +14,13 @@ type WebsocketClient struct {
 var _ Client = (*WebsocketClient)(nil)
 
 // NewWebsocketClient creates a websocket client
-func NewWebsocketClient(url string) (*WebsocketClient, error) {
+func NewWebsocketClient(endpoint string) (*WebsocketClient, error) {
+	url := endpoint
+
+	if !strings.HasPrefix(url, "ws://") {
+		url = "ws://" + url
+	}
+
 	conn, err := websocket.Dial(url, "", "http://localhost")
 	if err != nil {
 		return nil, err
