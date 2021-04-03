@@ -47,7 +47,7 @@ func (w *Worker) handleRequest(req worker.Request) error {
 	err := pipeline.RunFetcherPipeline(req.Height, w.client)
 	if err != nil {
 		rollbar.Error(err)
-		rollbar.Wait()
+		w.client.Reconnect()
 
 		return err
 	}

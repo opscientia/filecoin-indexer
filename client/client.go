@@ -9,8 +9,11 @@ import (
 	"github.com/filecoin-project/lotus/api/apistruct"
 )
 
-// Client fetches data from a Filecoin node
+// Client fetches data from a Lotus node
 type Client struct {
+	endpoint string
+	timeout  time.Duration
+
 	api    *apistruct.FullNodeStruct
 	closer jsonrpc.ClientCloser
 
@@ -21,39 +24,67 @@ type Client struct {
 	Account     accountClient
 }
 
-// NewClient creates a JSON RPC client
+// NewClient creates a Lotus client
 func NewClient(endpoint string, timeout time.Duration) (*Client, error) {
-	var api apistruct.FullNodeStruct
+	client := Client{
+		endpoint: endpoint,
+		timeout:  timeout,
+	}
 
-	ctx := context.Background()
-	addr := "ws://" + endpoint + "/rpc/v0"
-	outs := []interface{}{&api.Internal, &api.CommonStruct.Internal}
-
-	closer, err := jsonrpc.NewMergeClient(
-		ctx,
-		addr,
-		"Filecoin",
-		outs,
-		http.Header{},
-		jsonrpc.WithTimeout(timeout))
-
+	err := client.Connect()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{
-		api:    &api,
-		closer: closer,
-
-		Epoch:       epochClient{api: &api},
-		Deal:        dealClient{api: &api},
-		Miner:       minerClient{api: &api},
-		Transaction: transactionClient{api: &api},
-		Account:     accountClient{api: &api},
-	}, nil
+	return &client, nil
 }
 
-// Close closes the websocket connection
-func (c *Client) Close() {
+// Connect establishes a websocket connection
+func (c *Client) Connect() error {
+	var api apistruct.FullNodeStruct
+
+	closer, err := jsonrpc.NewMergeClient(
+		context.Background(),
+		"ws://"+c.endpoint+"/rpc/v0",
+		"Filecoin",
+		[]interface{}{&api.Internal, &api.CommonStruct.Internal},
+		http.Header{},
+		jsonrpc.WithTimeout(c.timeout))
+
+	if err != nil {
+		return err
+	}
+
+	c.setConnection(&api, closer)
+
+	return nil
+}
+
+func (c *Client) setConnection(api *apistruct.FullNodeStruct, closer jsonrpc.ClientCloser) {
+	c.api = api
+	c.closer = closer
+
+	c.Epoch = epochClient{api: api}
+	c.Deal = dealClient{api: api}
+	c.Miner = minerClient{api: api}
+	c.Transaction = transactionClient{api: api}
+	c.Account = accountClient{api: api}
+}
+
+// Close attempts to close the websocket connection
+func (c *Client) Close() (err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			err = v.(error)
+		}
+	}()
 	c.closer()
+
+	return nil
+}
+
+// Reconnect restablishes a websocket connection
+func (c *Client) Reconnect() error {
+	c.Close()
+	return c.Connect()
 }

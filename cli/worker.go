@@ -44,7 +44,6 @@ func runWorker(cfg *config.Config) error {
 			err := pipeline.StartIndexerPipeline(cfg, client, store)
 			if err != nil {
 				rollbar.Error(err)
-				rollbar.Wait()
 			}
 
 			ticker.Reset(interval)
