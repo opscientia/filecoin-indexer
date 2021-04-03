@@ -22,8 +22,8 @@ type Store struct {
 	Job         jobStore
 }
 
-// NewStore creates a store from the connection string
-func NewStore(connStr string, logMode logger.LogLevel) (*Store, error) {
+// NewStore creates a database store
+func NewStore(dsn string, logMode logger.LogLevel) (*Store, error) {
 	logger := logger.Default.LogMode(logMode)
 
 	config := gorm.Config{
@@ -31,7 +31,7 @@ func NewStore(connStr string, logMode logger.LogLevel) (*Store, error) {
 		Logger:          logger,
 	}
 
-	db, err := gorm.Open(postgres.Open(connStr), &config)
+	db, err := gorm.Open(postgres.Open(dsn), &config)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (s *Store) setTransaction(tx *gorm.DB) *Store {
 	s.Transaction = transactionStore{db: tx}
 	s.Event = eventStore{db: tx}
 
-	s.Job = jobStore{db: s.db}
+	s.Job = jobStore{db: s.db} // Use the default session
 
 	return s
 }

@@ -1,30 +1,21 @@
 package cli
 
-import (
-	"github.com/gin-gonic/gin"
-
-	"github.com/figment-networks/filecoin-indexer/config"
-	"github.com/figment-networks/filecoin-indexer/server"
-)
+import "github.com/figment-networks/filecoin-indexer/config"
 
 func runServer(cfg *config.Config) error {
-	client, err := initClient(cfg)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
-
 	store, err := initStore(cfg)
 	if err != nil {
 		return err
 	}
 	defer store.Close()
 
-	if !cfg.Debug {
-		gin.SetMode(gin.ReleaseMode)
+	client, err := initClient(cfg)
+	if err != nil {
+		return err
 	}
+	defer client.Close()
 
-	server, err := server.NewServer(cfg, store, client)
+	server, err := initServer(cfg, store, client)
 	if err != nil {
 		return err
 	}

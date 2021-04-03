@@ -5,10 +5,12 @@ import (
 
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/logger"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
+	"github.com/figment-networks/filecoin-indexer/server"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
@@ -33,7 +35,7 @@ func initConfig(path string) (*config.Config, error) {
 }
 
 func initClient(cfg *config.Config) (*client.Client, error) {
-	return client.NewClient(cfg.RPCEndpoint, cfg.ClientRPCTimeout())
+	return client.NewClient(cfg.RPCEndpoint, cfg.RPCTimeoutDuration)
 }
 
 func initStore(cfg *config.Config) (*store.Store, error) {
@@ -48,6 +50,14 @@ func initStore(cfg *config.Config) (*store.Store, error) {
 	}
 
 	return store, nil
+}
+
+func initServer(cfg *config.Config, store *store.Store, client *client.Client) (*server.Server, error) {
+	if !cfg.Debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	return server.NewServer(cfg, store, client)
 }
 
 func initMetrics(cfg *config.Config) error {

@@ -30,7 +30,7 @@ func runWorker(cfg *config.Config) error {
 		return err
 	}
 
-	interval := cfg.PipelineSyncInterval()
+	interval := cfg.SyncIntervalDuration
 	ticker := time.NewTicker(interval)
 
 	interrupt := make(chan os.Signal, 1)
@@ -41,7 +41,7 @@ func runWorker(cfg *config.Config) error {
 		case <-ticker.C:
 			ticker.Stop()
 
-			err := pipeline.StartPipeline(cfg, client, store)
+			err := pipeline.StartIndexerPipeline(cfg, client, store)
 			if err != nil {
 				rollbar.Error(err)
 				rollbar.Wait()

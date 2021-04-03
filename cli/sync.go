@@ -23,5 +23,5 @@ func runSync(cfg *config.Config) error {
 		return err
 	}
 
-	return pipeline.StartPipeline(cfg, client, store)
+	return pipeline.StartIndexerPipeline(cfg, client, store)
 }

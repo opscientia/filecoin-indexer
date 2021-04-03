@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	errEndpointRequired    = errors.New("RPC endpoint is required")
-	errDatabaseRequired    = errors.New("database credentials are required")
+	errRPCEndpointRequired = errors.New("RPC endpoint is required")
+	errDatabaseDSNRequired = errors.New("database DSN is required")
 	errRPCTimeoutInvalid   = errors.New("RPC timeout is invalid")
 	errSyncIntervalInvalid = errors.New("sync interval is invalid")
 )
@@ -33,8 +33,8 @@ type Config struct {
 	MetricsPort   uint16 `json:"metrics_port" envconfig:"METRICS_PORT" default:"8090"`
 	Debug         bool   `json:"debug" envconfig:"DEBUG"`
 
-	rpcTimeout   time.Duration
-	syncInterval time.Duration
+	RPCTimeoutDuration   time.Duration
+	SyncIntervalDuration time.Duration
 }
 
 // NewConfig creates a configuration
@@ -60,24 +60,24 @@ func FromFile(path string, config *Config) error {
 // Validate checks if the configuration is valid
 func (c *Config) Validate() error {
 	if c.RPCEndpoint == "" {
-		return errEndpointRequired
+		return errRPCEndpointRequired
 	}
 
 	if c.DatabaseDSN == "" {
-		return errDatabaseRequired
+		return errDatabaseDSNRequired
 	}
 
 	d, err := time.ParseDuration(c.RPCTimeout)
 	if err != nil {
 		return errRPCTimeoutInvalid
 	}
-	c.rpcTimeout = d
+	c.RPCTimeoutDuration = d
 
 	d, err = time.ParseDuration(c.SyncInterval)
 	if err != nil {
 		return errSyncIntervalInvalid
 	}
-	c.syncInterval = d
+	c.SyncIntervalDuration = d
 
 	return nil
 }
@@ -94,14 +94,4 @@ func (c *Config) MetricsListenAddr() string {
 
 func listenAddr(addr string, port uint16) string {
 	return fmt.Sprintf("%s:%d", addr, port)
-}
-
-// ClientRPCTimeout returns the timeout for the RPC client
-func (c *Config) ClientRPCTimeout() time.Duration {
-	return c.rpcTimeout
-}
-
-// PipelineSyncInterval returns the interval between synchronization jobs
-func (c *Config) PipelineSyncInterval() time.Duration {
-	return c.syncInterval
 }

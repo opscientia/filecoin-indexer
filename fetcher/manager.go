@@ -50,6 +50,8 @@ func (m *Manager) Run() error {
 		}
 
 		m.pool.Wait()
+
+		time.Sleep(m.cfg.SyncIntervalDuration)
 	}
 }
 
