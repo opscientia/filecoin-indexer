@@ -54,16 +54,16 @@ Example:
   "rpc_endpoint": "5.6.7.8:1234",
   "rpc_timeout": "30s",
   "database_dsn": "dbname=filecoin-indexer",
-  "server_addr": "localhost",
-  "server_port": 8080,
   "initial_height": 0,
   "batch_size": 100,
   "sync_interval": "1s",
+  "server_addr": "localhost",
+  "server_port": 8080,
+  "rollbar_token": "a672d00ae7967e33e6f07a9cbdbefb2a",
+  "rollbar_env": "staging",
   "metrics_addr": "127.0.0.1",
   "metrics_port": "8090",
   "metrics_path": "/metrics",
-  "rollbar_token": "a672d00ae7967e33e6f07a9cbdbefb2a",
-  "rollbar_server_root": "/home/deploy/filecoin-indexer",
   "debug": true
 }
 ```
@@ -72,20 +72,19 @@ Example:
 
 | Name                  | Description                | Default Value | Required |
 |-----------------------|----------------------------|---------------|----------|
-| `APP_ENV`             | Application environment    | `development` | Yes      |
 | `RPC_ENDPOINT`        | Lotus RPC endpoint         | —             | Yes      |
 | `RPC_TIMEOUT`         | RPC client timeout         | `30s`         | No       |
 | `DATABASE_DSN`        | PostgreSQL database URL    | —             | Yes      |
+| `INITIAL_HEIGHT`      | Initial sync height        | `0`           | No       |
+| `BATCH_SIZE`          | Number of heights per sync | —             | No       |
+| `SYNC_INTERVAL`       | Interval between sync jobs | `1s`          | No       |
 | `SERVER_ADDR`         | HTTP server address        | `0.0.0.0`     | No       |
 | `SERVER_PORT`         | HTTP server port           | `8080`        | No       |
-| `INITIAL_HEIGHT`      | Initial sync height        | `0`           | No       |
-| `BATCH_SIZE`          | Limit of heights per sync  | —             | No       |
-| `SYNC_INTERVAL`       | Interval between sync jobs | `1s`          | No       |
+| `ROLLBAR_TOKEN`       | Rollbar token              | —             | No       |
+| `ROLLBAR_ENV`         | Rollbar environment        | `development` | No       |
 | `METRICS_ADDR`        | Metrics server address     | `127.0.0.1`   | No       |
 | `METRICS_PORT`        | Metrics server port        | `8090`        | No       |
 | `METRICS_PATH`        | Metrics endpoint path      | `/metrics`    | No       |
-| `ROLLBAR_TOKEN`       | Rollbar token              | —             | No       |
-| `ROLLBAR_SERVER_ROOT` | Rollbar server root        | —             | No       |
 | `DEBUG`               | Debug mode                 | `false`       | No       |
 
 ## Running Application
