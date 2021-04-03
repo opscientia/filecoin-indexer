@@ -63,7 +63,6 @@ Example:
   "rollbar_env": "staging",
   "metrics_addr": "127.0.0.1",
   "metrics_port": "8090",
-  "metrics_path": "/metrics",
   "debug": true
 }
 ```
@@ -84,7 +83,6 @@ Example:
 | `ROLLBAR_ENV`         | Rollbar environment        | `development` | No       |
 | `METRICS_ADDR`        | Metrics server address     | `127.0.0.1`   | No       |
 | `METRICS_PORT`        | Metrics server port        | `8090`        | No       |
-| `METRICS_PATH`        | Metrics endpoint path      | `/metrics`    | No       |
 | `DEBUG`               | Debug mode                 | `false`       | No       |
 
 ## Running Application
@@ -121,6 +119,7 @@ $ filecoin-indexer -config config.json -cmd=server
 | GET    | `/events`                         | List of all events             |
 | GET    | `/health`                         | Health check                   |
 | GET    | `/status`                         | Synchronization status         |
+| GET    | `/metrics`                        | Prometheus metrics             |
 
 For more information see the [Miner Reputation System API](https://learn.figment.io/network-documentation/filecoin/rpc-and-rest-api/miner-reputation-system-api) on Figment Learn.
 

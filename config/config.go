@@ -31,7 +31,6 @@ type Config struct {
 	RollbarEnv    string `json:"rollbar_env" envconfig:"ROLLBAR_ENV" default:"development"`
 	MetricsAddr   string `json:"metrics_addr" envconfig:"METRICS_ADDR" default:"127.0.0.1"`
 	MetricsPort   uint16 `json:"metrics_port" envconfig:"METRICS_PORT" default:"8090"`
-	MetricsPath   string `json:"metrics_path" envconfig:"METRICS_PATH" default:"/metrics"`
 	Debug         bool   `json:"debug" envconfig:"DEBUG"`
 
 	rpcTimeout   time.Duration
