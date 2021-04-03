@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/figment-networks/indexing-engine/metrics"
@@ -12,6 +13,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/server"
 	"github.com/figment-networks/filecoin-indexer/store"
+	"github.com/figment-networks/filecoin-indexer/worker"
 )
 
 func initConfig(path string) (*config.Config, error) {
@@ -58,6 +60,34 @@ func initServer(cfg *config.Config, store *store.Store, client *client.Client) (
 	}
 
 	return server.NewServer(cfg, store, client)
+}
+
+func initWorkerPool(cfg *config.Config) (*worker.Pool, func(), error) {
+	var clients []worker.Client
+	var pool worker.Pool
+
+	endpoints := cfg.WorkerEndpoints()
+	if len(endpoints) == 0 {
+		return nil, nil, errors.New("no worker endpoints")
+	}
+
+	for _, endpoint := range endpoints {
+		client, err := worker.NewWebsocketClient(endpoint)
+		if err != nil {
+			return nil, nil, err
+		}
+		clients = append(clients, client)
+
+		pool.AddWorker(worker.NewPoolWorker(client))
+	}
+
+	close := func() {
+		for _, client := range clients {
+			client.Close()
+		}
+	}
+
+	return &pool, close, nil
 }
 
 func initMetrics(cfg *config.Config) error {

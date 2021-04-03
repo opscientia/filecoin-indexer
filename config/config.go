@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -25,6 +26,9 @@ type Config struct {
 	InitialHeight int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
 	BatchSize     int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
 	SyncInterval  string `json:"sync_interval" envconfig:"SYNC_INTERVAL" default:"1s"`
+	WorkerAddr    string `json:"worker_addr" envconfig:"WORKER_ADDR" default:"127.0.0.1"`
+	WorkerPort    uint16 `json:"worker_port" envconfig:"WORKER_PORT" default:"7000"`
+	Workers       string `json:"workers" envconfig:"WORKERS"`
 	ServerAddr    string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
 	ServerPort    uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
 	RollbarToken  string `json:"rollbar_token" envconfig:"ROLLBAR_TOKEN"`
@@ -80,6 +84,16 @@ func (c *Config) Validate() error {
 	c.SyncIntervalDuration = d
 
 	return nil
+}
+
+// WorkerEndpoints returns worker endpoints
+func (c *Config) WorkerEndpoints() []string {
+	return strings.Fields(c.Workers)
+}
+
+// WorkerListenAddr returns the listen address for the worker server
+func (c *Config) WorkerListenAddr() string {
+	return listenAddr(c.WorkerAddr, c.WorkerPort)
 }
 
 // ServerListenAddr returns the listen address for the API server

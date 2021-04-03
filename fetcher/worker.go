@@ -3,6 +3,7 @@ package fetcher
 import (
 	"net/http"
 
+	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -28,7 +29,7 @@ func NewWorker(cfg *config.Config, client *client.Client) *Worker {
 // Run starts the fetcher worker
 func (w *Worker) Run() error {
 	server := http.Server{
-		Addr:    w.cfg.ServerListenAddr(),
+		Addr:    w.cfg.WorkerListenAddr(),
 		Handler: websocket.Handler(w.handleConnection),
 	}
 
@@ -43,5 +44,13 @@ func (w *Worker) handleConnection(conn *websocket.Conn) {
 }
 
 func (w *Worker) handleRequest(req worker.Request) error {
-	return pipeline.RunFetcherPipeline(req.Height, w.client)
+	err := pipeline.RunFetcherPipeline(req.Height, w.client)
+	if err != nil {
+		rollbar.Error(err)
+		rollbar.Wait()
+
+		return err
+	}
+
+	return nil
 }

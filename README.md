@@ -57,11 +57,14 @@ Example:
   "initial_height": 0,
   "batch_size": 100,
   "sync_interval": "1s",
-  "server_addr": "localhost",
+  "worker_addr": "localhost",
+  "worker_port": "7000",
+  "workers": "localhost:7000 localhost:7001",
+  "server_addr": "0.0.0.0",
   "server_port": 8080,
   "rollbar_token": "a672d00ae7967e33e6f07a9cbdbefb2a",
   "rollbar_env": "staging",
-  "metrics_addr": "127.0.0.1",
+  "metrics_addr": "localhost",
   "metrics_port": "8090",
   "debug": true
 }
@@ -69,21 +72,24 @@ Example:
 
 ### Environment variables
 
-| Name                  | Description                | Default Value | Required |
-|-----------------------|----------------------------|---------------|----------|
-| `RPC_ENDPOINT`        | Lotus RPC endpoint         | —             | Yes      |
-| `RPC_TIMEOUT`         | RPC client timeout         | `30s`         | No       |
-| `DATABASE_DSN`        | PostgreSQL database URL    | —             | Yes      |
-| `INITIAL_HEIGHT`      | Initial sync height        | `0`           | No       |
-| `BATCH_SIZE`          | Number of heights per sync | —             | No       |
-| `SYNC_INTERVAL`       | Interval between sync jobs | `1s`          | No       |
-| `SERVER_ADDR`         | HTTP server address        | `0.0.0.0`     | No       |
-| `SERVER_PORT`         | HTTP server port           | `8080`        | No       |
-| `ROLLBAR_TOKEN`       | Rollbar token              | —             | No       |
-| `ROLLBAR_ENV`         | Rollbar environment        | `development` | No       |
-| `METRICS_ADDR`        | Metrics server address     | `127.0.0.1`   | No       |
-| `METRICS_PORT`        | Metrics server port        | `8090`        | No       |
-| `DEBUG`               | Debug mode                 | `false`       | No       |
+| Name                  | Description                      | Default Value    | Required |
+|-----------------------|----------------------------------|------------------|----------|
+| `RPC_ENDPOINT`        | Lotus RPC endpoint               | —                | Yes      |
+| `RPC_TIMEOUT`         | RPC client timeout               | `30s`            | No       |
+| `DATABASE_DSN`        | PostgreSQL database URL          | —                | Yes      |
+| `INITIAL_HEIGHT`      | Initial sync height              | `0`              | No       |
+| `BATCH_SIZE`          | Number of heights per sync       | —                | No       |
+| `SYNC_INTERVAL`       | Interval between sync jobs       | `1s`             | No       |
+| `WORKER_ADDR`         | Worker server address            | `127.0.0.1`      | No       |
+| `WORKER_PORT`         | Worker server port               | `7000`           | No       |
+| `WORKERS`             | Space-separated worker endpoints | `127.0.0.1:7000` | No       |
+| `SERVER_ADDR`         | API server address               | `0.0.0.0`        | No       |
+| `SERVER_PORT`         | API server port                  | `8080`           | No       |
+| `ROLLBAR_TOKEN`       | Rollbar token                    | —                | No       |
+| `ROLLBAR_ENV`         | Rollbar environment              | `development`    | No       |
+| `METRICS_ADDR`        | Metrics server address           | `127.0.0.1`      | No       |
+| `METRICS_PORT`        | Metrics server port              | `8090`           | No       |
+| `DEBUG`               | Debug mode                       | `false`          | No       |
 
 ## Running Application
 
