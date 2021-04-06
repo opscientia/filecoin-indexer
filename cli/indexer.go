@@ -12,7 +12,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/pipeline"
 )
 
-func runWorker(cfg *config.Config) error {
+func runIndexer(cfg *config.Config) error {
 	client, err := initClient(cfg)
 	if err != nil {
 		return err

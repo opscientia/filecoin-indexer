@@ -23,12 +23,14 @@ Usage of ./filecoin-indexer:
     	Command to run
   -config string
     	Path to a config file
+  -mode string
+    	Fetcher mode (default "worker")
 ```
 
 Executing commands:
 
 ```bash
-$ filecoin-indexer -config path/to/config.json -cmd=COMMAND
+$ filecoin-indexer -config path/to/config.json -cmd COMMAND -mode MODE
 ```
 
 Available commands:
@@ -37,8 +39,8 @@ Available commands:
 |------------|-----------------------------------------------|
 | `migrate`  | Migrates the database                         |
 | `rollback` | Rolls the schema back to the previous version |
-| `sync`     | Runs a one-time synchronization job           |
-| `worker`   | Starts the synchronization worker             |
+| `fetcher`  | Starts the fetching process                   |
+| `indexer`  | Starts the indexing process                   |
 | `server`   | Starts the API server                         |
 
 ## Configuration
@@ -96,19 +98,19 @@ Example:
 Once you have created a database and specified all configuration options, you need to migrate the database:
 
 ```bash
-$ filecoin-indexer -config config.json -cmd=migrate
+$ filecoin-indexer -config config.json -cmd migrate
 ```
 
-The synchronization process can be initiated with the command below:
+The indexing process can be started with the command below:
 
 ```bash
-$ filecoin-indexer -config config.json -cmd=sync
+$ filecoin-indexer -config config.json -cmd indexer
 ```
 
 To start the API server, you have to run the following command:
 
 ```bash
-$ filecoin-indexer -config config.json -cmd=server
+$ filecoin-indexer -config config.json -cmd server
 ```
 
 ## API Reference

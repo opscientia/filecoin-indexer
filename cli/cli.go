@@ -11,9 +11,11 @@ import (
 // Run executes the command line interface
 func Run() {
 	var command string
+	var mode string
 	var configPath string
 
 	flag.StringVar(&command, "cmd", "", "Command to run")
+	flag.StringVar(&mode, "mode", "worker", "Fetcher mode")
 	flag.StringVar(&configPath, "config", "", "Path to a config file")
 	flag.Parse()
 
@@ -29,19 +31,19 @@ func Run() {
 		terminate("Command is required")
 	}
 
-	if err := runCommand(cfg, command); err != nil {
+	if err := runCommand(cfg, command, mode); err != nil {
 		terminate(err)
 	}
 }
 
-func runCommand(cfg *config.Config, name string) error {
+func runCommand(cfg *config.Config, name string, mode string) error {
 	switch name {
 	case "migrate", "rollback":
 		return runMigrations(cfg, name)
-	case "sync":
-		return runSync(cfg)
-	case "worker":
-		return runWorker(cfg)
+	case "fetcher":
+		return runFetcher(cfg, mode)
+	case "indexer":
+		return runIndexer(cfg)
 	case "server":
 		return runServer(cfg)
 	default:
