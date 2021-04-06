@@ -12,7 +12,7 @@ func MetricsMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		if path != metricsPath {
+		if path != _metricsPath {
 			observer := serverRequestDuration.WithLabels(path)
 
 			t := metrics.NewTimer(observer)

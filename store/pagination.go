@@ -1,15 +1,15 @@
 package store
 
-const (
-	paginationDefaultLimit = 100
-	paginationMaxLimit     = 1000
-)
-
 // Pagination represents the pagination parameters
 type Pagination struct {
 	Page  int64 `form:"page"`
 	Limit int64 `form:"limit"`
 }
+
+const (
+	_paginationDefaultLimit = 100
+	_paginationMaxLimit     = 1000
+)
 
 // Validate sanitizes the pagination parameters
 func (p *Pagination) Validate() error {
@@ -17,10 +17,10 @@ func (p *Pagination) Validate() error {
 		p.Page = 1
 	}
 	if p.Limit <= 0 {
-		p.Limit = paginationDefaultLimit
+		p.Limit = _paginationDefaultLimit
 	}
-	if p.Limit >= paginationMaxLimit {
-		p.Limit = paginationMaxLimit
+	if p.Limit >= _paginationMaxLimit {
+		p.Limit = _paginationMaxLimit
 	}
 	return nil
 }

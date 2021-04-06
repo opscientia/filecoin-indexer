@@ -10,8 +10,6 @@ import (
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
-const metricsPath = "/metrics"
-
 // Server handles HTTP requests
 type Server struct {
 	engine *gin.Engine
@@ -19,6 +17,8 @@ type Server struct {
 	store  *store.Store
 	client *client.Client
 }
+
+const _metricsPath = "/metrics"
 
 // NewServer creates an HTTP server
 func NewServer(cfg *config.Config, store *store.Store, client *client.Client) (*Server, error) {
@@ -71,7 +71,7 @@ func (s *Server) initMetrics() error {
 		return err
 	}
 
-	s.engine.GET(metricsPath, gin.WrapH(metrics.Handler()))
+	s.engine.GET(_metricsPath, gin.WrapH(metrics.Handler()))
 
 	return nil
 }

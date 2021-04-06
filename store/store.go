@@ -8,8 +8,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const createBatchSize = 1000
-
 // Store handles database operations
 type Store struct {
 	db *gorm.DB
@@ -22,12 +20,14 @@ type Store struct {
 	Job         jobStore
 }
 
+const _createBatchSize = 1000
+
 // NewStore creates a database store
 func NewStore(dsn string, logMode logger.LogLevel) (*Store, error) {
 	logger := logger.Default.LogMode(logMode)
 
 	config := gorm.Config{
-		CreateBatchSize: createBatchSize,
+		CreateBatchSize: _createBatchSize,
 		Logger:          logger,
 	}
 

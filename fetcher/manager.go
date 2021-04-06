@@ -107,7 +107,8 @@ func (m *Manager) getHeightRange() (*pipeline.HeightRange, error) {
 		BatchSize:     m.cfg.BatchSize,
 	}
 
-	if err := hr.Validate(false); err != nil {
+	err = hr.Validate(false /* checkLength */)
+	if err != nil {
 		return nil, err
 	}
 

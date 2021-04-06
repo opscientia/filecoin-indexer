@@ -37,7 +37,8 @@ func NewSource(cfg *config.Config, client *client.Client, store *store.Store) (p
 		BatchSize:     cfg.BatchSize,
 	}
 
-	if err := hr.Validate(true); err != nil {
+	err = hr.Validate(true /* checkLength */)
+	if err != nil {
 		return nil, err
 	}
 
