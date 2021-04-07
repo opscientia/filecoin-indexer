@@ -15,9 +15,9 @@ func (js *jobStore) Create(jobs []model.Job) error {
 	return js.db.Create(jobs).Error
 }
 
-// Save updates the job record
-func (js *jobStore) Save(job *model.Job) error {
-	return js.db.Save(job).Error
+// Update updates the selected fields of the job record
+func (js *jobStore) Update(job *model.Job, fields ...string) error {
+	return js.db.Model(job).Select(fields).Updates(job).Error
 }
 
 // FindByHeight retrieves a job record for a given height

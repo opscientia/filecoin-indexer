@@ -1,6 +1,7 @@
 package fetcher
 
 import (
+	"math"
 	"time"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -17,15 +18,18 @@ type Manager struct {
 	pool   *worker.Pool
 	store  *store.Store
 	client *client.Client
+
+	failures map[model.JobID]uint64
 }
 
 // NewManager creates a fetcher manager
 func NewManager(cfg *config.Config, pool *worker.Pool, store *store.Store, client *client.Client) (*Manager, error) {
 	manager := Manager{
-		cfg:    cfg,
-		pool:   pool,
-		store:  store,
-		client: client,
+		cfg:      cfg,
+		pool:     pool,
+		store:    store,
+		client:   client,
+		failures: make(map[model.JobID]uint64),
 	}
 
 	return &manager, nil
@@ -116,6 +120,10 @@ func (m *Manager) getHeightRange() (*pipeline.HeightRange, error) {
 }
 
 func (m *Manager) scheduleJob(job *model.Job) error {
+	if m.isJobDelayed(job) {
+		return nil
+	}
+
 	m.pool.Process(*job.Height)
 
 	now := time.Now()
@@ -123,7 +131,7 @@ func (m *Manager) scheduleJob(job *model.Job) error {
 	job.StartedAt = &now
 	job.RunCount++
 
-	err := m.store.Job.Save(job)
+	err := m.store.Job.Update(job, "started_at", "run_count")
 	if err != nil {
 		return err
 	}
@@ -131,22 +139,50 @@ func (m *Manager) scheduleJob(job *model.Job) error {
 	return nil
 }
 
-func (m *Manager) handleResponse(res worker.Response) {
-	now := time.Now()
+func (m *Manager) isJobDelayed(job *model.Job) bool {
+	failureCount := m.failures[job.ID]
 
+	if job.StartedAt == nil || failureCount == 0 {
+		return false
+	}
+
+	penalty := math.Pow(2, float64(failureCount))
+	delay := time.Duration(penalty) * time.Second
+
+	return time.Since(*job.StartedAt) < delay
+}
+
+func (m *Manager) handleResponse(res worker.Response) {
 	job, err := m.store.Job.FindByHeight(res.Height)
 	if err != nil {
 		panic(err)
 	}
 
 	if res.Success {
-		job.FinishedAt = &now
+		m.handleSuccess(job)
 	} else {
-		job.LastError = res.Error
+		m.handleFailure(job, res)
 	}
+}
 
-	err = m.store.Job.Save(job)
+func (m *Manager) handleSuccess(job *model.Job) {
+	now := time.Now()
+
+	job.FinishedAt = &now
+
+	err := m.store.Job.Update(job, "finished_at")
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (m *Manager) handleFailure(job *model.Job, res worker.Response) {
+	job.LastError = &res.Error
+
+	err := m.store.Job.Update(job, "last_error")
+	if err != nil {
+		panic(err)
+	}
+
+	m.failures[job.ID]++
 }
