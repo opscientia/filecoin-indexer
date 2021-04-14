@@ -3,6 +3,7 @@ package pipeline
 import (
 	"time"
 
+	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
@@ -10,8 +11,8 @@ import (
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/ipfs/go-cid"
 
+	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/model"
-	"github.com/figment-networks/indexing-engine/pipeline"
 )
 
 var (
@@ -20,11 +21,13 @@ var (
 )
 
 // PayloadFactory creates payloads
-type PayloadFactory struct{}
+type PayloadFactory struct {
+	dataLake *datalake.DataLake
+}
 
 // NewPayloadFactory creates a payload factory
-func NewPayloadFactory() *PayloadFactory {
-	return &PayloadFactory{}
+func NewPayloadFactory(dl *datalake.DataLake) *PayloadFactory {
+	return &PayloadFactory{dataLake: dl}
 }
 
 // GetPayload returns a payload for a given height
@@ -32,6 +35,7 @@ func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
 	return &payload{
 		startedAt:     time.Now(),
 		currentHeight: height,
+		dataLake:      pf.dataLake,
 	}
 }
 
@@ -39,6 +43,8 @@ type payload struct {
 	startedAt     time.Time
 	currentHeight int64
 	processed     bool
+
+	dataLake *datalake.DataLake
 
 	// Fetcher stage
 	EpochTipset          *types.TipSet
@@ -82,4 +88,22 @@ func (p *payload) IsProcessed() bool {
 
 func (p *payload) Duration() float64 {
 	return time.Since(p.startedAt).Seconds()
+}
+
+func (p *payload) Store(name string, obj interface{}) error {
+	res, err := datalake.NewJSONResource(name, obj)
+	if err != nil {
+		return err
+	}
+
+	return p.dataLake.StoreResourceAtHeight(res, p.currentHeight)
+}
+
+func (p *payload) Retrieve(name string, obj interface{}) error {
+	res, err := p.dataLake.RetrieveResourceAtHeight(name, p.currentHeight)
+	if err != nil {
+		return err
+	}
+
+	return res.ScanJSON(obj)
 }

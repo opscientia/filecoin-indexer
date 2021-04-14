@@ -56,6 +56,7 @@ Example:
   "rpc_endpoint": "5.6.7.8:1234",
   "rpc_timeout": "30s",
   "database_dsn": "dbname=filecoin-indexer",
+  "redis_url": "localhost:6379",
   "initial_height": 0,
   "batch_size": 100,
   "sync_interval": "1s",
@@ -79,6 +80,7 @@ Example:
 | `RPC_ENDPOINT`        | Lotus RPC endpoint               | —                | Yes      |
 | `RPC_TIMEOUT`         | RPC client timeout               | `30s`            | No       |
 | `DATABASE_DSN`        | PostgreSQL database URL          | —                | Yes      |
+| `REDIS_URL`           | Redis server URL                 | `127.0.0.1:6379` | No       |
 | `INITIAL_HEIGHT`      | Initial sync height              | `0`              | No       |
 | `BATCH_SIZE`          | Number of heights per sync       | —                | No       |
 | `SYNC_INTERVAL`       | Interval between sync jobs       | `1s`             | No       |
@@ -101,16 +103,42 @@ Once you have created a database and specified all configuration options, you ne
 $ filecoin-indexer -config config.json -cmd migrate
 ```
 
-The indexing process can be started with the command below:
+To start the indexing process, execute the following command:
 
 ```bash
 $ filecoin-indexer -config config.json -cmd indexer
 ```
 
-To start the API server, you have to run the following command:
+The API server can be started by running the command below:
 
 ```bash
 $ filecoin-indexer -config config.json -cmd server
+```
+
+### Multiple workers
+
+Fetching data from a Lotus node is the most time-consuming part of the indexing process.
+In order to speed it up, you can run multiple fetching workers connected to different Lotus nodes.
+The workers, orchestrated by a manager process, are capable of fetching data for different heights in parallel, resulting in better indexing performance.
+
+To start a fetching worker, execute the command below:
+
+```bash
+$ filecoin-indexer -config config.json -cmd fetcher -mode worker
+```
+
+Although workers can share the same config file, each worker process has to have a unique listen port and metrics port.
+The worker-specific configuration options can be passed as environment variables.
+For instance:
+
+```bash
+$ WORKER_PORT=7001 METRICS_PORT=8091 filecoin-indexer -config config.json -cmd fetcher -mode worker
+```
+
+To start a manager process, run the following command:
+
+```bash
+$ filecoin-indexer -config config.json -cmd fetcher -mode manager
 ```
 
 ## API Reference

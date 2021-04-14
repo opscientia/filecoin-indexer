@@ -11,6 +11,7 @@ import (
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
+	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/server"
 	"github.com/figment-networks/filecoin-indexer/store"
 	"github.com/figment-networks/filecoin-indexer/worker"
@@ -60,6 +61,14 @@ func initServer(cfg *config.Config, store *store.Store, client *client.Client) (
 	}
 
 	return server.NewServer(cfg, store, client)
+}
+
+func initDataLake(cfg *config.Config) (*datalake.DataLake, error) {
+	storage := datalake.NewRedisStorage(cfg.RedisURL, 0)
+
+	dl := datalake.NewDataLake("filecoin", "mainnet", storage)
+
+	return dl, nil
 }
 
 func initWorkerPool(cfg *config.Config) (*worker.Pool, func(), error) {

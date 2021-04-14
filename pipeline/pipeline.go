@@ -7,12 +7,13 @@ import (
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
+	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
 // RunFetcherPipeline runs the fetching pipeline
-func RunFetcherPipeline(height int64, client *client.Client) error {
-	p := pipeline.NewDefault(NewPayloadFactory())
+func RunFetcherPipeline(height int64, client *client.Client, dl *datalake.DataLake) error {
+	p := pipeline.NewDefault(NewPayloadFactory(dl))
 
 	p.SetTasks(pipeline.StageFetcher,
 		NewEpochFetcherTask(client),
@@ -30,13 +31,13 @@ func RunFetcherPipeline(height int64, client *client.Client) error {
 }
 
 // StartIndexerPipeline starts the indexing pipeline
-func StartIndexerPipeline(cfg *config.Config, client *client.Client, store *store.Store) error {
+func StartIndexerPipeline(cfg *config.Config, client *client.Client, store *store.Store, dl *datalake.DataLake) error {
 	source, err := NewSource(cfg, client, store)
 	if err != nil {
 		return err
 	}
 
-	p := pipeline.NewDefault(NewPayloadFactory())
+	p := pipeline.NewDefault(NewPayloadFactory(dl))
 
 	p.SetTasks(pipeline.StageFetcher,
 		NewEpochFetcherTask(client),

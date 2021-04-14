@@ -23,6 +23,7 @@ type Config struct {
 	RPCEndpoint   string `json:"rpc_endpoint" envconfig:"RPC_ENDPOINT"`
 	RPCTimeout    string `json:"rpc_timeout" envconfig:"RPC_TIMEOUT" default:"30s"`
 	DatabaseDSN   string `json:"database_dsn" envconfig:"DATABASE_DSN"`
+	RedisURL      string `json:"redis_url" envconfig:"REDIS_URL" default:"127.0.0.1:6379"`
 	InitialHeight int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
 	BatchSize     int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
 	SyncInterval  string `json:"sync_interval" envconfig:"SYNC_INTERVAL" default:"1s"`

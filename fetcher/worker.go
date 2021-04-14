@@ -3,11 +3,11 @@ package fetcher
 import (
 	"net/http"
 
-	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
+	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/pipeline"
 	"github.com/figment-networks/filecoin-indexer/worker"
 )
@@ -16,13 +16,15 @@ import (
 type Worker struct {
 	cfg    *config.Config
 	client *client.Client
+	dl     *datalake.DataLake
 }
 
 // NewWorker creates a fetcher worker
-func NewWorker(cfg *config.Config, client *client.Client) *Worker {
+func NewWorker(cfg *config.Config, client *client.Client, dl *datalake.DataLake) *Worker {
 	return &Worker{
 		cfg:    cfg,
 		client: client,
+		dl:     dl,
 	}
 }
 
@@ -44,7 +46,7 @@ func (w *Worker) handleConnection(conn *websocket.Conn) {
 }
 
 func (w *Worker) handleRequest(req worker.Request) error {
-	err := pipeline.RunFetcherPipeline(req.Height, w.client)
+	err := pipeline.RunFetcherPipeline(req.Height, w.client, w.dl)
 	if err != nil {
 		rollbar.Error(err)
 		w.client.Reconnect()

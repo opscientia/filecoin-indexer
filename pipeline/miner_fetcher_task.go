@@ -7,6 +7,7 @@ import (
 	"github.com/filecoin-project/go-bitfield"
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/miner"
+	"go.uber.org/multierr"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -33,6 +34,37 @@ func (t *MinerFetcherTask) GetName() string {
 // Run performs the task
 func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
+
+	if err := t.retrieveMiners(payload); err != nil {
+		if err := t.fetchMiners(ctx, payload); err != nil {
+			return err
+		}
+
+		if err := t.storeMiners(payload); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *MinerFetcherTask) retrieveMiners(payload *payload) error {
+	return multierr.Combine(
+		payload.Retrieve("miners_info", &payload.MinersInfo),
+		payload.Retrieve("miners_power", &payload.MinersPower),
+		payload.Retrieve("miners_faults", &payload.MinersFaults),
+	)
+}
+
+func (t *MinerFetcherTask) storeMiners(payload *payload) error {
+	return multierr.Combine(
+		payload.Store("miners_info", payload.MinersInfo),
+		payload.Store("miners_power", payload.MinersPower),
+		payload.Store("miners_faults", payload.MinersFaults),
+	)
+}
+
+func (t *MinerFetcherTask) fetchMiners(ctx context.Context, payload *payload) error {
 	addresses := payload.MinersAddresses
 
 	payload.MinersInfo = make([]*miner.MinerInfo, len(addresses))
@@ -44,7 +76,7 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	for i := range addresses {
 		func(index int) {
 			eg.Go(func() error {
-				return fetchMinerData(index, t.client, payload)
+				return t.fetchMinerData(index, payload)
 			})
 		}(i)
 	}
@@ -52,28 +84,28 @@ func (t *MinerFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	return eg.Wait()
 }
 
-func fetchMinerData(index int, c *client.Client, p *payload) error {
-	address := p.MinersAddresses[index]
-	tsk := p.EpochTipset.Key()
+func (t *MinerFetcherTask) fetchMinerData(index int, payload *payload) error {
+	address := payload.MinersAddresses[index]
+	tsk := payload.EpochTipset.Key()
 
-	info, err := c.Miner.GetInfoByTipset(address, tsk)
+	info, err := t.client.Miner.GetInfoByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	power, err := c.Miner.GetPowerByTipset(address, tsk)
+	power, err := t.client.Miner.GetPowerByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	faults, err := c.Miner.GetFaultsByTipset(address, tsk)
+	faults, err := t.client.Miner.GetFaultsByTipset(address, tsk)
 	if err != nil {
 		return err
 	}
 
-	p.MinersInfo[index] = info
-	p.MinersPower[index] = power
-	p.MinersFaults[index] = faults
+	payload.MinersInfo[index] = info
+	payload.MinersPower[index] = power
+	payload.MinersFaults[index] = faults
 
 	return nil
 }

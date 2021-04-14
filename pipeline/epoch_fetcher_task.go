@@ -30,6 +30,22 @@ func (t *EpochFetcherTask) GetName() string {
 func (t *EpochFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
+	err := payload.Retrieve("tipset", &payload.EpochTipset)
+	if err != nil {
+		if err := t.fetchTipset(payload); err != nil {
+			return err
+		}
+
+		err := payload.Store("tipset", payload.EpochTipset)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (t *EpochFetcherTask) fetchTipset(payload *payload) error {
 	tipset, err := t.client.Epoch.GetTipsetByHeight(payload.currentHeight)
 	if err != nil {
 		return err

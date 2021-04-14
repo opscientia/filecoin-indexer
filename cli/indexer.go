@@ -25,6 +25,11 @@ func runIndexer(cfg *config.Config) error {
 	}
 	defer store.Close()
 
+	dl, err := initDataLake(cfg)
+	if err != nil {
+		return err
+	}
+
 	err = initMetrics(cfg)
 	if err != nil {
 		return err
@@ -41,7 +46,7 @@ func runIndexer(cfg *config.Config) error {
 		case <-ticker.C:
 			ticker.Stop()
 
-			err := pipeline.StartIndexerPipeline(cfg, client, store)
+			err := pipeline.StartIndexerPipeline(cfg, client, store, dl)
 			if err != nil {
 				rollbar.Error(err)
 			}

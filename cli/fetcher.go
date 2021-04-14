@@ -24,7 +24,17 @@ func runFetcher(cfg *config.Config, mode string) error {
 }
 
 func runFetcherWorker(cfg *config.Config, client *client.Client) error {
-	return fetcher.NewWorker(cfg, client).Run()
+	dl, err := initDataLake(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = initMetrics(cfg)
+	if err != nil {
+		return err
+	}
+
+	return fetcher.NewWorker(cfg, client, dl).Run()
 }
 
 func runFetcherManager(cfg *config.Config, client *client.Client) error {
