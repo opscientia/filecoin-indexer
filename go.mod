@@ -1,6 +1,6 @@
 module github.com/figment-networks/filecoin-indexer
 
-go 1.14
+go 1.15
 
 require (
 	github.com/figment-networks/indexing-engine v0.2.0

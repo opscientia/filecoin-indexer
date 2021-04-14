@@ -4,7 +4,7 @@ Data indexer and API service for the Filecoin network
 
 ## Requirements
 
-- Go 1.14+
+- Go 1.15+
 - PostgreSQL 10+
 
 ## Installation
