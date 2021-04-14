@@ -1,10 +1,14 @@
 package worker
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
-// PoolWorker represents a pool worker
+// PoolWorker represents a worker in a pool
 type PoolWorker struct {
 	client  Client
+	backoff Backoff
 	channel chan int64
 }
 
@@ -31,17 +35,35 @@ func (pw *PoolWorker) Run(handler ResponseHandler, wg *sync.WaitGroup) {
 func (pw *PoolWorker) Process(height int64, handler ResponseHandler) {
 	err := pw.client.Send(Request{Height: height})
 	if err != nil {
-		panic(err)
+		pw.Reconnect()
+		return
 	}
 
 	var res Response
 
 	err = pw.client.Receive(&res)
 	if err != nil {
-		panic(err)
+		pw.Reconnect()
+		return
 	}
 
 	handler(res)
+}
+
+// Reconnect reestablishes the worker connection
+func (pw *PoolWorker) Reconnect() error {
+	time.Sleep(pw.backoff.Delay())
+
+	pw.backoff.Attempt()
+
+	err := pw.client.Reconnect()
+	if err != nil {
+		return err
+	}
+
+	pw.backoff.Reset()
+
+	return nil
 }
 
 // Stop stops the pool worker

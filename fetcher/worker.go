@@ -3,6 +3,7 @@ package fetcher
 import (
 	"net/http"
 
+	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 
 	"github.com/figment-networks/filecoin-indexer/client"

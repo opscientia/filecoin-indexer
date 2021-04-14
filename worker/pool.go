@@ -25,6 +25,8 @@ func (p *Pool) Run(handler ResponseHandler) {
 
 // Process schedules the processing of a given height
 func (p *Pool) Process(height int64) {
+	p.wg.Add(1)
+
 	cases := make([]reflect.SelectCase, len(p.workers))
 
 	for i, worker := range p.workers {
@@ -36,8 +38,6 @@ func (p *Pool) Process(height int64) {
 	}
 
 	reflect.Select(cases)
-
-	p.wg.Add(1)
 }
 
 // Wait blocks until all workers are finished

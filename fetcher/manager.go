@@ -1,7 +1,6 @@
 package fetcher
 
 import (
-	"math"
 	"time"
 
 	"github.com/figment-networks/filecoin-indexer/client"
@@ -19,17 +18,18 @@ type Manager struct {
 	store  *store.Store
 	client *client.Client
 
-	failures map[model.JobID]uint64
+	backoffs map[model.JobID]*worker.Backoff
 }
 
 // NewManager creates a fetcher manager
 func NewManager(cfg *config.Config, pool *worker.Pool, store *store.Store, client *client.Client) (*Manager, error) {
 	manager := Manager{
-		cfg:      cfg,
-		pool:     pool,
-		store:    store,
-		client:   client,
-		failures: make(map[model.JobID]uint64),
+		cfg:    cfg,
+		pool:   pool,
+		store:  store,
+		client: client,
+
+		backoffs: make(map[model.JobID]*worker.Backoff),
 	}
 
 	return &manager, nil
@@ -140,16 +140,19 @@ func (m *Manager) scheduleJob(job *model.Job) error {
 }
 
 func (m *Manager) isJobDelayed(job *model.Job) bool {
-	failureCount := m.failures[job.ID]
-
-	if job.StartedAt == nil || failureCount == 0 {
+	if job.StartedAt == nil {
 		return false
 	}
 
-	penalty := math.Pow(2, float64(failureCount))
-	delay := time.Duration(penalty) * time.Second
+	return time.Since(*job.StartedAt) < m.jobBackoff(job).Delay()
+}
 
-	return time.Since(*job.StartedAt) < delay
+func (m *Manager) jobBackoff(job *model.Job) *worker.Backoff {
+	if m.backoffs[job.ID] == nil {
+		m.backoffs[job.ID] = &worker.Backoff{}
+	}
+
+	return m.backoffs[job.ID]
 }
 
 func (m *Manager) handleResponse(res worker.Response) {
@@ -184,5 +187,5 @@ func (m *Manager) handleFailure(job *model.Job, res worker.Response) {
 		panic(err)
 	}
 
-	m.failures[job.ID]++
+	m.jobBackoff(job).Attempt()
 }

@@ -17,6 +17,7 @@ type Client interface {
 	Send(Request) error
 	Receive(*Response) error
 	Close() error
+	Reconnect() error
 }
 
 // Server interacts with a manager

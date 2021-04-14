@@ -8,6 +8,7 @@ import (
 
 // WebsocketClient interacts with a worker using a websocket
 type WebsocketClient struct {
+	url  string
 	conn *websocket.Conn
 }
 
@@ -16,17 +17,29 @@ var _ Client = (*WebsocketClient)(nil)
 // NewWebsocketClient creates a websocket client
 func NewWebsocketClient(endpoint string) (*WebsocketClient, error) {
 	url := endpoint
-
 	if !strings.HasPrefix(url, "ws://") {
 		url = "ws://" + url
 	}
 
-	conn, err := websocket.Dial(url, "", "http://localhost")
-	if err != nil {
+	wc := WebsocketClient{url: url}
+
+	if err := wc.Connect(); err != nil {
 		return nil, err
 	}
 
-	return &WebsocketClient{conn: conn}, nil
+	return &wc, nil
+}
+
+// Connect establishes a websocket connection
+func (wc *WebsocketClient) Connect() error {
+	conn, err := websocket.Dial(wc.url, "", "http://localhost")
+	if err != nil {
+		return err
+	}
+
+	wc.conn = conn
+
+	return nil
 }
 
 // Send sends a request to a worker
@@ -42,6 +55,12 @@ func (wc *WebsocketClient) Receive(res *Response) error {
 // Close closes the websocket connection
 func (wc *WebsocketClient) Close() error {
 	return wc.conn.Close()
+}
+
+// Reconnect reestablishes a websocket connection
+func (wc *WebsocketClient) Reconnect() error {
+	wc.Close()
+	return wc.Connect()
 }
 
 // WebsocketServer interacts with a manager using a websocket
