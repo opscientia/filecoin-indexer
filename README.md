@@ -127,7 +127,7 @@ To start a fetching worker, execute the command below:
 $ filecoin-indexer -config config.json -cmd fetcher -mode worker
 ```
 
-Although workers can share the same config file, each worker process has to have a unique listen port and metrics port.
+Although workers can share the same config file, each worker process requires a unique listen port and metrics port.
 The worker-specific configuration options can be passed as environment variables.
 For instance:
 
@@ -157,7 +157,7 @@ $ filecoin-indexer -config config.json -cmd fetcher -mode manager
 | GET    | `/status`                         | Synchronization status         |
 | GET    | `/metrics`                        | Prometheus metrics             |
 
-For more information see the [Miner Reputation System API](https://learn.figment.io/network-documentation/filecoin/rpc-and-rest-api/miner-reputation-system-api) on Figment Learn.
+For more information see the [Miner Reputation System API](https://learn.figment.io/network-documentation/filecoin/rpc-and-rest-api/miner-reputation-system-api) page on Figment Learn.
 
 ## Score Calculation
 

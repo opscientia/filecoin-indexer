@@ -50,7 +50,7 @@ func (pw *PoolWorker) Process(height int64, handler ResponseHandler) {
 	handler(res)
 }
 
-// Reconnect reestablishes the worker connection
+// Reconnect reestablishes the connection with a worker
 func (pw *PoolWorker) Reconnect() error {
 	time.Sleep(pw.backoff.Delay())
 
