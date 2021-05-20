@@ -1,0 +1,152 @@
+global:
+  labels:
+    team: indexers
+    severity: noncritical
+  annotations:
+    figment.io/github_repository: github.com/figment-networks/filecoin-indexer
+
+configmaps:
+  filecoin-indexer:
+    data:
+      indexer-config.json: json://indexer-config.json
+
+jobs:
+  filecoin-indexer-migrations:
+    annotations:
+      helm.sh/hook: "pre-install,pre-upgrade"
+    pod:
+      containers:
+        filecoin-indexer-migration:
+          command:
+            - /app/bin/filecoin-indexer
+            - -config
+            - /app/config/indexer-config.json
+            - -cmd=migrate
+          env:
+            METRICS_PORT: ????
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+            limits:
+              memory: 200Mi
+          volumeMounts:
+            name: config
+            mountPath: /app/config
+    volumes:
+      - name: config
+        configMap:
+          name: filecoin-indexer
+
+
+statefulsets:
+  filecoin-indexer-indexer:
+    service:
+      ports:
+        http:
+          port: 8080
+          targetPort: 8080
+          protocol: TCP
+    replicas: 2
+    pod:
+      containers:
+        filecoin-indexer-indexer:
+          command:
+            - /app/bin/filecoin-indexer
+            - -config
+            - /app/config/indexer-config.json
+            - -cmd=indexer
+          env:
+            REDIS_URL: filecoin-indexer-redis
+            INITIAL_HEIGHT: ???
+            ROLLBAR_ENV: prod
+            WORKER_PORT: ????
+            METRICS_PORT: ????
+            RPC_ENDPOINT: ????
+          livenessProbe:
+            disabled: true
+          readinessProbe:
+            disabled: true
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+            limits:
+              memory: 200Mi
+          volumeMounts:
+            name: config
+            mountPath: /app/config
+    volumes:
+      - name: config
+        configMap:
+          name: filecoin-indexer
+
+deployments:
+  filecoin-indexer-server:
+    service:
+      ports:
+        http:
+          port: 8080
+          targetPort: 8080
+          protocol: TCP
+    replicas: 1
+    pod:
+      containers:
+        filecoin-indexer:
+          command:
+            - /app/bin/filecoin-indexer
+            - -config
+            - /app/config/indexer-config.json
+            - -cmd=server
+          env:
+            REDIS_URL: filecoin-indexer-redis
+            INITIAL_HEIGHT: ???
+            ROLLBAR_ENV: prod
+            WORKER_PORT: ????
+            METRICS_PORT: ????
+            RPC_ENDPOINT: ????
+          livenessProbe:
+            disabled: true
+          readinessProbe:
+            disabled: true
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+            limits:
+              memory: 200Mi
+          volumeMounts:
+            name: config
+            mountPath: /app/config
+    volumes:
+      - name: config
+        configMap:
+          name: filecoin-indexer
+
+  filecoin-indexer-redis:
+    service:
+      ports:
+        redis:
+          port: 6379
+          targetPort: 6379
+          protocol: TCP
+    replicas: 1
+    pod:
+      containers:
+        redis:
+          image: redis:6.2.3
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 30m
+            limits:
+              memory: 300Mi
+
+
+
