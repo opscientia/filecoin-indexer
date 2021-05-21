@@ -19,7 +19,7 @@ func Run() {
 	flag.StringVar(&configPath, "config", "", "Path to a config file")
 	flag.Parse()
 
-	cfg, err := initConfig(configPath)
+	cfg, err := initConfig(configPath, command, mode)
 	if err != nil {
 		terminate(err)
 	}

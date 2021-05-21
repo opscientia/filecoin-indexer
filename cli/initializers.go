@@ -17,7 +17,7 @@ import (
 	"github.com/figment-networks/filecoin-indexer/worker"
 )
 
-func initConfig(path string) (*config.Config, error) {
+func initConfig(path, command, mode string) (*config.Config, error) {
 	cfg := config.NewConfig()
 
 	if path != "" {
@@ -30,7 +30,7 @@ func initConfig(path string) (*config.Config, error) {
 		return nil, err
 	}
 
-	if err := cfg.Validate(); err != nil {
+	if err := cfg.Validate(command, mode); err != nil {
 		return nil, err
 	}
 

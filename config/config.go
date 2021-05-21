@@ -63,13 +63,17 @@ func FromFile(path string, config *Config) error {
 }
 
 // Validate checks if the configuration is valid
-func (c *Config) Validate() error {
+func (c *Config) Validate(cmd, mode string) error {
 	if c.RPCEndpoint == "" {
-		return errRPCEndpointRequired
+		if cmd != "migrate" && cmd != "rollback" {
+			return errRPCEndpointRequired
+		}
 	}
 
 	if c.DatabaseDSN == "" {
-		return errDatabaseDSNRequired
+		if cmd != "fetcher" || mode != "worker" {
+			return errDatabaseDSNRequired
+		}
 	}
 
 	d, err := time.ParseDuration(c.RPCTimeout)
