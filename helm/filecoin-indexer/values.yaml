@@ -6,32 +6,32 @@ global:
     figment.io/github_repository: github.com/figment-networks/filecoin-indexer
   env:
     DATABASE_DSN:
-      secretsManagersKeyRef:
+      secretsManagerKeyRef:
         key: prod/indexers/filecoin-indexer
         property: database_dsn
     RPC_ENDPOINT: 51.222.104.211 # dh--filecoin-node--4
     ROLLBAR_ENV: prod
     ROLLBAR_TOKEN:
-      secretsManagersKeyRef:
+      secretsManagerKeyRef:
         key: prod/indexers/common
         property: rollbar_token
 
-#jobs:
-#  filecoin-indexer-migrations:
-#    annotations:
-#      helm.sh/hook: pre-install,pre-upgrade
-#    pod:
-#      containers:
-#        filecoin-indexer-migration:
-#          command:
-#            - /app/bin/filecoin-indexer
-#            - -cmd=migrate
-#          resources:
-#            requests:
-#              memory: 200Mi
-#              cpu: 500m
-#            limits:
-#              memory: 200Mi
+jobs:
+  filecoin-indexer-migrations:
+    annotations:
+      helm.sh/hook: pre-install,pre-upgrade
+    pod:
+      containers:
+        filecoin-indexer-migration:
+          command:
+            - /app/bin/filecoin-indexer
+            - -cmd=migrate
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+            limits:
+              memory: 200Mi
 
 deployments:
   filecoin-indexer-fetcher-manager:
@@ -164,6 +164,8 @@ deployments:
       containers:
         redis:
           image: redis:6.2.3
+          securityContext:
+            runAsNonRoot: false
           livenessProbe:
             tcpSocket:
               port: 6379
