@@ -21,7 +21,7 @@ RUN make build
 # ------------------------------------------------------------------------------
 # Target Image
 # ------------------------------------------------------------------------------
-FROM alpine:3.10 AS release
+FROM alpine:3.10 AS runner
 
 RUN adduser --system --uid 1234 figment
 
@@ -34,4 +34,4 @@ COPY --from=build /build/migrations /app/migrations
 
 EXPOSE 8080
 
-CMD ["/app/filecoin-indexer"]
+CMD ["/app/bin/filecoin-indexer"]
