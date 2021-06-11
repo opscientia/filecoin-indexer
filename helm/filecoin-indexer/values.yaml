@@ -7,8 +7,8 @@ global:
   env:
     DATABASE_DSN:
       secretsManagerKeyRef:
-        key: prod/indexers/filecoin-indexer
-        property: database_dsn
+        key: production/indexers/filecoin-indexer
+        property: db_dsn
     RPC_ENDPOINT: 51.222.104.211:1234 # dh--filecoin-node--4
     ROLLBAR_ENV: production
     ROLLBAR_TOKEN:
@@ -18,22 +18,32 @@ global:
     DEBUG: "true"
     REDIS_URL: filecoin-indexer-redis:6379
 
-jobs:
-  filecoin-indexer-migrations:
-    annotations:
-      helm.sh/hook: pre-install,pre-upgrade
-    pod:
-      containers:
-        filecoin-indexer-migration:
-          command:
-            - /app/bin/filecoin-indexer
-            - -cmd=migrate
-          resources:
-            requests:
-              memory: 200Mi
-              cpu: 500m
-            limits:
-              memory: 200Mi
+redis:
+  name: filecoin-indexer-redis
+  resources:
+    requests:
+      memory: 8Gi
+    limits:
+      memory: 16Gi
+  config:
+    maxmemory: 8gb
+
+    #jobs:
+    #  filecoin-indexer-migrations:
+    #    annotations:
+    #      helm.sh/hook: pre-install,pre-upgrade
+    #    pod:
+    #      containers:
+    #        filecoin-indexer-migration:
+    #          command:
+    #            - /app/bin/filecoin-indexer
+    #            - -cmd=migrate
+    #          resources:
+    #            requests:
+    #              memory: 200Mi
+    #              cpu: 500m
+    #            limits:
+    #              memory: 200Mi
 
 deployments:
   filecoin-indexer-fetcher-manager:
@@ -48,8 +58,7 @@ deployments:
           env:
             INITIAL_HEIGHT: 0
             BATCH_SIZE: 100
-            #WORKERS: "filecoin-indexer-fetcher-worker-0:7000 filecoin-indexer-fetcher-worker-1:7000"
-            WORKERS: "filecoin-indexer-fetcher-worker-0:7000"
+            WORKERS: "filecoin-indexer-fetcher-worker-0:7000 filecoin-indexer-fetcher-worker-1:7000"
           livenessProbe:
             disabled: true
           readinessProbe:
@@ -170,34 +179,3 @@ deployments:
               cpu: 500m
             limits:
               memory: 200Mi
-
-
-  filecoin-indexer-redis:
-    service:
-      ports:
-        redis:
-          port: 6379
-          targetPort: 6379
-          protocol: TCP
-    replicas: 1
-    pod:
-      containers:
-        redis:
-          image: redis:6.2.3
-          securityContext:
-            runAsNonRoot: false
-          livenessProbe:
-            tcpSocket:
-              port: 6379
-          readinessProbe:
-            tcpSocket:
-              port: 6379
-          resources:
-            requests:
-              memory: 4Gi
-              cpu: 100m
-            limits:
-              memory: 4Gi
-
-
-
