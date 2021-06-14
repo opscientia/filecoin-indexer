@@ -3,6 +3,7 @@ package fetcher
 import (
 	"net/http"
 
+	"github.com/figment-networks/indexing-engine/worker"
 	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/pipeline"
-	"github.com/figment-networks/filecoin-indexer/worker"
 )
 
 // Worker represents a fetcher worker

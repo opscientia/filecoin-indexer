@@ -3,12 +3,13 @@ package fetcher
 import (
 	"time"
 
+	"github.com/figment-networks/indexing-engine/worker"
+
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/model"
 	"github.com/figment-networks/filecoin-indexer/pipeline"
 	"github.com/figment-networks/filecoin-indexer/store"
-	"github.com/figment-networks/filecoin-indexer/worker"
 )
 
 // Manager represents a fetcher manager

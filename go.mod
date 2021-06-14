@@ -3,7 +3,7 @@ module github.com/figment-networks/filecoin-indexer
 go 1.15
 
 require (
-	github.com/figment-networks/indexing-engine v0.2.0
+	github.com/figment-networks/indexing-engine v0.3.1
 	github.com/filecoin-project/go-address v0.0.4
 	github.com/filecoin-project/go-bitfield v0.2.1
 	github.com/filecoin-project/go-jsonrpc v0.1.2-0.20201008195726-68c6a2704e49
@@ -11,7 +11,7 @@ require (
 	github.com/filecoin-project/lotus v1.1.2
 	github.com/filecoin-project/specs-actors/v2 v2.2.0
 	github.com/gin-gonic/gin v1.6.3
-	github.com/go-redis/redis/v8 v8.8.0
+	github.com/go-redis/redis/v8 v8.8.2
 	github.com/ipfs/go-cid v0.0.7
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pressly/goose v2.6.0+incompatible

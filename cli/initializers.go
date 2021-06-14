@@ -6,6 +6,7 @@ import (
 
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
+	"github.com/figment-networks/indexing-engine/worker"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/logger"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/server"
 	"github.com/figment-networks/filecoin-indexer/store"
-	"github.com/figment-networks/filecoin-indexer/worker"
 )
 
 func initConfig(path, command, mode string) (*config.Config, error) {
