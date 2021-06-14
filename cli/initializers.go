@@ -20,14 +20,14 @@ import (
 func initConfig(path, command, mode string) (*config.Config, error) {
 	cfg := config.NewConfig()
 
+	if err := config.FromEnv(cfg); err != nil {
+		return nil, err
+	}
+
 	if path != "" {
 		if err := config.FromFile(path, cfg); err != nil {
 			return nil, err
 		}
-	}
-
-	if err := config.FromEnv(cfg); err != nil {
-		return nil, err
 	}
 
 	if err := cfg.Validate(command, mode); err != nil {
