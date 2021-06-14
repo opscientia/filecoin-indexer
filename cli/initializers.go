@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/figment-networks/indexing-engine/datalake"
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
 	"github.com/figment-networks/indexing-engine/worker"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
-	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/server"
 	"github.com/figment-networks/filecoin-indexer/store"
 )

@@ -3,11 +3,11 @@ package pipeline
 import (
 	"context"
 
+	"github.com/figment-networks/indexing-engine/datalake"
 	"github.com/figment-networks/indexing-engine/pipeline"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
-	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 

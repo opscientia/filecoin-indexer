@@ -3,13 +3,13 @@ package fetcher
 import (
 	"net/http"
 
+	"github.com/figment-networks/indexing-engine/datalake"
 	"github.com/figment-networks/indexing-engine/worker"
 	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
-	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/pipeline"
 )
 

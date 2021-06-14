@@ -3,6 +3,7 @@ package pipeline
 import (
 	"time"
 
+	"github.com/figment-networks/indexing-engine/datalake"
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-bitfield"
@@ -11,7 +12,6 @@ import (
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/ipfs/go-cid"
 
-	"github.com/figment-networks/filecoin-indexer/datalake"
 	"github.com/figment-networks/filecoin-indexer/model"
 )
 
@@ -91,12 +91,12 @@ func (p *payload) Duration() float64 {
 }
 
 func (p *payload) Store(name string, obj interface{}) error {
-	res, err := datalake.NewJSONResource(name, obj)
+	res, err := datalake.NewJSONResource(obj)
 	if err != nil {
 		return err
 	}
 
-	return p.dataLake.StoreResourceAtHeight(res, p.currentHeight)
+	return p.dataLake.StoreResourceAtHeight(res, name, p.currentHeight)
 }
 
 func (p *payload) Retrieve(name string, obj interface{}) error {
