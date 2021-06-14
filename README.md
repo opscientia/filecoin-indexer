@@ -57,6 +57,7 @@ Example:
   "rpc_timeout": "30s",
   "database_dsn": "dbname=filecoin-indexer",
   "redis_url": "localhost:6379",
+  "redis_exp": "24h",
   "initial_height": 0,
   "batch_size": 100,
   "sync_interval": "1s",
@@ -81,6 +82,7 @@ Example:
 | `RPC_TIMEOUT`         | RPC client timeout               | `30s`            | No       |
 | `DATABASE_DSN`        | PostgreSQL database URL          | —                | Yes      |
 | `REDIS_URL`           | Redis server URL                 | `127.0.0.1:6379` | No       |
+| `REDIS_EXP`           | Redis expiration time            | `0`              | No       |
 | `INITIAL_HEIGHT`      | Initial sync height              | `0`              | No       |
 | `BATCH_SIZE`          | Number of heights per sync       | —                | No       |
 | `SYNC_INTERVAL`       | Interval between sync jobs       | `1s`             | No       |

@@ -15,6 +15,7 @@ var (
 	errRPCEndpointRequired = errors.New("RPC endpoint is required")
 	errDatabaseDSNRequired = errors.New("database DSN is required")
 	errRPCTimeoutInvalid   = errors.New("RPC timeout is invalid")
+	errRedisExpInvalid     = errors.New("redis expiration time is invalid")
 	errSyncIntervalInvalid = errors.New("sync interval is invalid")
 )
 
@@ -24,6 +25,7 @@ type Config struct {
 	RPCTimeout    string `json:"rpc_timeout" envconfig:"RPC_TIMEOUT" default:"30s"`
 	DatabaseDSN   string `json:"database_dsn" envconfig:"DATABASE_DSN"`
 	RedisURL      string `json:"redis_url" envconfig:"REDIS_URL" default:"127.0.0.1:6379"`
+	RedisExp      string `json:"redis_exp" envconfig:"REDIS_EXP" default:"0"`
 	InitialHeight int64  `json:"initial_height" envconfig:"INITIAL_HEIGHT"`
 	BatchSize     int64  `json:"batch_size" envconfig:"BATCH_SIZE"`
 	SyncInterval  string `json:"sync_interval" envconfig:"SYNC_INTERVAL" default:"1s"`
@@ -39,6 +41,7 @@ type Config struct {
 	Debug         bool   `json:"debug" envconfig:"DEBUG"`
 
 	RPCTimeoutDuration   time.Duration
+	RedisExpDuration     time.Duration
 	SyncIntervalDuration time.Duration
 }
 
@@ -81,6 +84,12 @@ func (c *Config) Validate(cmd, mode string) error {
 		return errRPCTimeoutInvalid
 	}
 	c.RPCTimeoutDuration = d
+
+	d, err = time.ParseDuration(c.RedisExp)
+	if err != nil {
+		return errRedisExpInvalid
+	}
+	c.RedisExpDuration = d
 
 	d, err = time.ParseDuration(c.SyncInterval)
 	if err != nil {

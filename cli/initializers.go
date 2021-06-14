@@ -64,7 +64,7 @@ func initServer(cfg *config.Config, store *store.Store, client *client.Client) (
 }
 
 func initDataLake(cfg *config.Config) (*datalake.DataLake, error) {
-	storage := datalake.NewRedisStorage(cfg.RedisURL, 0)
+	storage := datalake.NewRedisStorage(cfg.RedisURL, cfg.RedisExpDuration)
 
 	dl := datalake.NewDataLake("filecoin", "mainnet", storage)
 
