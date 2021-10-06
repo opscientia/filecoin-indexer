@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/figment-networks/indexing-engine/datalake"
-	"github.com/figment-networks/indexing-engine/worker"
+	"github.com/figment-networks/indexing-engine/pipeline/worker"
 	"github.com/rollbar/rollbar-go"
 	"golang.org/x/net/websocket"
 

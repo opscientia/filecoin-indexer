@@ -7,7 +7,7 @@ import (
 	"github.com/figment-networks/indexing-engine/datalake"
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
-	"github.com/figment-networks/indexing-engine/worker"
+	"github.com/figment-networks/indexing-engine/pipeline/worker"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/logger"
 

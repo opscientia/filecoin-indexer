@@ -30,7 +30,7 @@ func NewSource(cfg *config.Config, client *client.Client, store *store.Store) (p
 		lastHeight = -1
 	}
 
-	hr := HeightRange{
+	hr := pipeline.HeightRange{
 		LatestHeight:  latestHeight,
 		LastHeight:    lastHeight,
 		InitialHeight: cfg.InitialHeight,

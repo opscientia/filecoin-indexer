@@ -3,12 +3,12 @@ package fetcher
 import (
 	"time"
 
-	"github.com/figment-networks/indexing-engine/worker"
+	"github.com/figment-networks/indexing-engine/pipeline"
+	"github.com/figment-networks/indexing-engine/pipeline/worker"
 
 	"github.com/figment-networks/filecoin-indexer/client"
 	"github.com/figment-networks/filecoin-indexer/config"
 	"github.com/figment-networks/filecoin-indexer/model"
-	"github.com/figment-networks/filecoin-indexer/pipeline"
 	"github.com/figment-networks/filecoin-indexer/store"
 )
 
