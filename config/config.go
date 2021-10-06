@@ -31,7 +31,7 @@ type Config struct {
 	SyncInterval  string `json:"sync_interval" envconfig:"SYNC_INTERVAL" default:"1s"`
 	WorkerAddr    string `json:"worker_addr" envconfig:"WORKER_ADDR" default:"127.0.0.1"`
 	WorkerPort    uint16 `json:"worker_port" envconfig:"WORKER_PORT" default:"7000"`
-	Workers       string `json:"workers" envconfig:"WORKERS"`
+	Workers       string `json:"workers" envconfig:"WORKERS" default:"127.0.0.1:7000"`
 	ServerAddr    string `json:"server_addr" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
 	ServerPort    uint16 `json:"server_port" envconfig:"SERVER_PORT" default:"8080"`
 	RollbarToken  string `json:"rollbar_token" envconfig:"ROLLBAR_TOKEN"`
