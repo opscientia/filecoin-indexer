@@ -42,7 +42,6 @@ func (pf *PayloadFactory) GetPayload(height int64) pipeline.Payload {
 type payload struct {
 	startedAt     time.Time
 	currentHeight int64
-	processed     bool
 
 	dataLake *datalake.DataLake
 
@@ -78,13 +77,7 @@ func (p *payload) GetCurrentHeight() int64 {
 	return p.currentHeight
 }
 
-func (p *payload) MarkAsProcessed() {
-	p.processed = true
-}
-
-func (p *payload) IsProcessed() bool {
-	return p.processed
-}
+func (p *payload) MarkAsProcessed() {}
 
 func (p *payload) Duration() float64 {
 	return time.Since(p.startedAt).Seconds()
