@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/figment-networks/indexing-engine/metrics"
+	m "github.com/figment-networks/indexing-engine/pipeline/metrics"
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -13,7 +14,7 @@ type epochStore struct {
 
 // Create inserts the epoch record
 func (es *epochStore) Create(epoch *model.Epoch) error {
-	observer := databaseQueryDuration.WithLabels("epochStore_Create")
+	observer := m.DatabaseQueryDuration.WithLabels("epochStore_Create")
 
 	timer := metrics.NewTimer(observer)
 	defer timer.ObserveDuration()

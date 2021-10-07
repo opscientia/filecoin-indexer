@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/figment-networks/indexing-engine/metrics"
+	m "github.com/figment-networks/indexing-engine/pipeline/metrics"
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -13,7 +14,7 @@ type minerStore struct {
 
 // Create bulk-inserts the miner records
 func (ms *minerStore) Create(miners []*model.Miner) error {
-	observer := databaseQueryDuration.WithLabels("minerStore_Create")
+	observer := m.DatabaseQueryDuration.WithLabels("minerStore_Create")
 
 	timer := metrics.NewTimer(observer)
 	defer timer.ObserveDuration()

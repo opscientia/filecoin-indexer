@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/figment-networks/indexing-engine/metrics"
+	m "github.com/figment-networks/indexing-engine/pipeline/metrics"
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -14,7 +15,7 @@ type eventStore struct {
 
 // Create bulk-inserts the event records
 func (es *eventStore) Create(event []*model.Event) error {
-	observer := databaseQueryDuration.WithLabels("eventStore_Create")
+	observer := m.DatabaseQueryDuration.WithLabels("eventStore_Create")
 
 	timer := metrics.NewTimer(observer)
 	defer timer.ObserveDuration()

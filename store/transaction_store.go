@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/figment-networks/indexing-engine/metrics"
+	m "github.com/figment-networks/indexing-engine/pipeline/metrics"
 	"gorm.io/gorm"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -13,7 +14,7 @@ type transactionStore struct {
 
 // Create bulk-inserts the transaction records
 func (ts *transactionStore) Create(transactions []*model.Transaction) error {
-	observer := databaseQueryDuration.WithLabels("transactionStore_Create")
+	observer := m.DatabaseQueryDuration.WithLabels("transactionStore_Create")
 
 	timer := metrics.NewTimer(observer)
 	defer timer.ObserveDuration()
