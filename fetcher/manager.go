@@ -1,6 +1,7 @@
 package fetcher
 
 import (
+	"log"
 	"time"
 
 	"github.com/figment-networks/indexing-engine/pipeline"
@@ -122,10 +123,13 @@ func (m *Manager) getHeightRange() (*pipeline.HeightRange, error) {
 
 func (m *Manager) scheduleJob(job *model.Job) error {
 	if m.isJobDelayed(job) {
+		log.Printf("job skipped [height=%d]", *job.Height)
 		return nil
 	}
 
 	m.pool.Process(*job.Height)
+
+	log.Printf("job started [height=%d]", *job.Height)
 
 	now := time.Now()
 
@@ -170,6 +174,8 @@ func (m *Manager) handleResponse(res worker.Response) {
 }
 
 func (m *Manager) handleSuccess(job *model.Job) {
+	log.Printf("job finished [height=%d]", *job.Height)
+
 	now := time.Now()
 
 	job.FinishedAt = &now
@@ -181,6 +187,8 @@ func (m *Manager) handleSuccess(job *model.Job) {
 }
 
 func (m *Manager) handleFailure(job *model.Job, res worker.Response) {
+	log.Printf("job error [height=%d]: %s", *job.Height, res.Error)
+
 	job.LastError = &res.Error
 
 	err := m.store.Job.Update(job, "last_error")

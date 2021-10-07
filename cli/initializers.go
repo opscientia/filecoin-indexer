@@ -77,7 +77,7 @@ func initWorkerPool(cfg *config.Config) (*worker.Pool, func(), error) {
 
 	endpoints := cfg.WorkerEndpoints()
 	if len(endpoints) == 0 {
-		return nil, nil, errors.New("no worker endpoints")
+		return nil, nil, errors.New("no worker endpoints provided")
 	}
 
 	for _, endpoint := range endpoints {

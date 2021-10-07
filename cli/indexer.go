@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -48,6 +49,7 @@ func runIndexer(cfg *config.Config) error {
 
 			err := pipeline.StartIndexerPipeline(cfg, client, store, dl)
 			if err != nil {
+				log.Println("ERROR:", err)
 				rollbar.Error(err)
 			}
 

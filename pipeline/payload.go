@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/figment-networks/indexing-engine/datalake"
@@ -86,7 +87,8 @@ func (p *payload) Duration() float64 {
 func (p *payload) Store(name string, obj interface{}) error {
 	res, err := datalake.NewJSONResource(obj)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot store %s in data lake [height=%d]: %v",
+			name, p.currentHeight, err)
 	}
 
 	return p.dataLake.StoreResourceAtHeight(res, name, p.currentHeight)
@@ -95,7 +97,8 @@ func (p *payload) Store(name string, obj interface{}) error {
 func (p *payload) Retrieve(name string, obj interface{}) error {
 	res, err := p.dataLake.RetrieveResourceAtHeight(name, p.currentHeight)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot retrieve %s from data lake [height=%d]: %v",
+			name, p.currentHeight, err)
 	}
 
 	return res.ScanJSON(obj)

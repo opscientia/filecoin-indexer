@@ -1,6 +1,7 @@
 package fetcher
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/figment-networks/indexing-engine/datalake"
@@ -47,13 +48,20 @@ func (w *Worker) handleConnection(conn *websocket.Conn) {
 }
 
 func (w *Worker) handleRequest(req worker.Request) error {
+	log.Printf("job started [height=%d]", req.Height)
+
 	err := pipeline.RunFetcherPipeline(req.Height, w.client, w.dl)
 	if err != nil {
+		log.Printf("job error [height=%d]: %v", req.Height, err)
 		rollbar.Error(err)
+
+		log.Println("reconnecting to the node...")
 		w.client.Reconnect()
 
 		return err
 	}
+
+	log.Printf("job finished [height=%d]", req.Height)
 
 	return nil
 }
