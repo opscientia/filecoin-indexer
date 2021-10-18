@@ -65,15 +65,15 @@ func (t *MinerFetcherTask) storeMiners(payload *payload) error {
 }
 
 func (t *MinerFetcherTask) fetchMiners(ctx context.Context, payload *payload) error {
-	addresses := payload.MinersAddresses
+	minersCount := len(payload.MinersAddresses)
 
-	payload.MinersInfo = make([]*miner.MinerInfo, len(addresses))
-	payload.MinersPower = make([]*api.MinerPower, len(addresses))
-	payload.MinersFaults = make([]*bitfield.BitField, len(addresses))
+	payload.MinersInfo = make([]*miner.MinerInfo, minersCount)
+	payload.MinersPower = make([]*api.MinerPower, minersCount)
+	payload.MinersFaults = make([]*bitfield.BitField, minersCount)
 
 	eg, _ := errgroup.WithContext(ctx)
 
-	for i := range addresses {
+	for i := 0; i < minersCount; i++ {
 		func(index int) {
 			eg.Go(func() error {
 				return t.fetchMinerData(index, payload)

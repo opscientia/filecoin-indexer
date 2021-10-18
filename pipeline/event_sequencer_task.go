@@ -141,17 +141,14 @@ func (t *EventSequencerTask) trackSectorFaults(p *payload) {
 }
 
 func (t *EventSequencerTask) trackSlashedDeals(p *payload) {
-	for _, dealID := range p.DealsSlashedIDs {
+	for dealID, deal := range p.DealsSlashed {
 		if slice.Contains(p.StoredSlashedDealIDs, dealID) {
 			continue
 		}
 
-		deal := p.DealsData[dealID]
-		slashEpoch := int64(deal.State.SlashEpoch)
-
 		event := model.Event{
-			Height:       &slashEpoch,
-			MinerAddress: deal.Proposal.Provider.String(),
+			Height:       &deal.SlashEpoch,
+			MinerAddress: deal.MinerAddress,
 			Kind:         types.SlashedDealEvent,
 
 			Data: map[string]interface{}{"deal_id": dealID},

@@ -42,8 +42,8 @@ func (t *MinerParserTask) Run(ctx context.Context, p pipeline.Payload) error {
 		}
 		faultsCount := uint32(fc)
 
-		dealsCount := payload.DealsCount[address]
-		slashedDealsCount := payload.DealsSlashedCount[address]
+		dealsCount := payload.DealsCount[address.String()]
+		slashedDealsCount := payload.DealsSlashedCount[address.String()]
 
 		score := score.CalculateScore(score.Variables{
 			SectorSize:        sectorSize,

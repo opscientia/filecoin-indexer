@@ -5,8 +5,11 @@ import (
 
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-address"
+	"github.com/filecoin-project/lotus/api"
+	"go.uber.org/multierr"
 
 	"github.com/figment-networks/filecoin-indexer/client"
+	"github.com/figment-networks/filecoin-indexer/model/types"
 )
 
 // DealFetcherTask fetches raw deal data
@@ -31,55 +34,70 @@ func (t *DealFetcherTask) GetName() string {
 func (t *DealFetcherTask) Run(ctx context.Context, p pipeline.Payload) error {
 	payload := p.(*payload)
 
-	err := payload.Retrieve("deals", &payload.DealsData)
-	if err != nil {
-		if err := t.fetchDeals(payload); err != nil {
-			return err
-		}
+	if err := t.retrieveDeals(payload); err != nil {
+		tsk := payload.EpochTipset.Key()
 
-		err := payload.Store("deals", payload.DealsData)
+		deals, err := t.client.Deal.GetMarketDeals(tsk)
 		if err != nil {
 			return err
 		}
+
+		t.parseDeals(deals, payload)
+
+		if err := t.storeDeals(payload); err != nil {
+			return err
+		}
 	}
 
-	t.parseDeals(payload)
-	t.parseMinersAddresses(payload)
-
-	return nil
+	return t.parseMinersAddresses(payload)
 }
 
-func (t *DealFetcherTask) fetchDeals(payload *payload) error {
-	tsk := payload.EpochTipset.Key()
-
-	deals, err := t.client.Deal.GetMarketDeals(tsk)
-	if err != nil {
-		return err
-	}
-
-	payload.DealsData = deals
-
-	return nil
+func (t *DealFetcherTask) retrieveDeals(payload *payload) error {
+	return multierr.Combine(
+		payload.Retrieve("deals_count", &payload.DealsCount),
+		payload.Retrieve("deals_slashed_count", &payload.DealsSlashedCount),
+		payload.Retrieve("deals_slashed", &payload.DealsSlashed),
+	)
 }
 
-func (t *DealFetcherTask) parseDeals(payload *payload) {
-	payload.DealsCount = make(map[address.Address]uint32)
-	payload.DealsSlashedCount = make(map[address.Address]uint32)
+func (t *DealFetcherTask) storeDeals(payload *payload) error {
+	return multierr.Combine(
+		payload.Store("deals_count", payload.DealsCount),
+		payload.Store("deals_slashed_count", payload.DealsSlashedCount),
+		payload.Store("deals_slashed", payload.DealsSlashed),
+	)
+}
 
-	for dealID, deal := range payload.DealsData {
-		minerAddress := deal.Proposal.Provider
+func (t *DealFetcherTask) parseDeals(deals map[string]api.MarketDeal, payload *payload) {
+	payload.DealsCount = make(map[string]uint32)
+	payload.DealsSlashedCount = make(map[string]uint32)
+	payload.DealsSlashed = make(map[string]types.SlashedDeal)
+
+	for dealID, deal := range deals {
+		minerAddress := deal.Proposal.Provider.String()
 
 		payload.DealsCount[minerAddress]++
 
 		if deal.State.SlashEpoch != -1 {
 			payload.DealsSlashedCount[minerAddress]++
-			payload.DealsSlashedIDs = append(payload.DealsSlashedIDs, dealID)
+
+			payload.DealsSlashed[dealID] = types.SlashedDeal{
+				MinerAddress: minerAddress,
+				SlashEpoch:   int64(deal.State.SlashEpoch),
+			}
 		}
 	}
 }
 
-func (t *DealFetcherTask) parseMinersAddresses(payload *payload) {
-	for address := range payload.DealsCount {
-		payload.MinersAddresses = append(payload.MinersAddresses, address)
+func (t *DealFetcherTask) parseMinersAddresses(payload *payload) error {
+	for minerAddress := range payload.DealsCount {
+		addr, err := address.NewFromString(minerAddress)
+		if err != nil {
+			return err
+		}
+
+		payload.MinersAddresses = append(payload.MinersAddresses, addr)
 	}
+
+	return nil
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/ipfs/go-cid"
 
 	"github.com/figment-networks/filecoin-indexer/model"
+	t "github.com/figment-networks/filecoin-indexer/model/types"
 )
 
 var (
@@ -48,10 +49,9 @@ type payload struct {
 
 	// Fetcher stage
 	EpochTipset          *types.TipSet
-	DealsData            map[string]api.MarketDeal
-	DealsCount           map[address.Address]uint32
-	DealsSlashedCount    map[address.Address]uint32
-	DealsSlashedIDs      []string
+	DealsCount           map[string]uint32
+	DealsSlashedCount    map[string]uint32
+	DealsSlashed         map[string]t.SlashedDeal
 	MinersAddresses      []address.Address
 	MinersInfo           []*miner.MinerInfo
 	MinersPower          []*api.MinerPower
@@ -87,8 +87,8 @@ func (p *payload) Duration() float64 {
 func (p *payload) Store(name string, obj interface{}) error {
 	res, err := datalake.NewJSONResource(obj)
 	if err != nil {
-		return fmt.Errorf("cannot store %s in data lake [height=%d]: %v",
-			name, p.currentHeight, err)
+		msg := "cannot store %s in data lake [height=%d]: %v"
+		return fmt.Errorf(msg, name, p.currentHeight, err)
 	}
 
 	return p.dataLake.StoreResourceAtHeight(res, name, p.currentHeight)
@@ -97,8 +97,8 @@ func (p *payload) Store(name string, obj interface{}) error {
 func (p *payload) Retrieve(name string, obj interface{}) error {
 	res, err := p.dataLake.RetrieveResourceAtHeight(name, p.currentHeight)
 	if err != nil {
-		return fmt.Errorf("cannot retrieve %s from data lake [height=%d]: %v",
-			name, p.currentHeight, err)
+		msg := "cannot retrieve %s from data lake [height=%d]: %v"
+		return fmt.Errorf(msg, name, p.currentHeight, err)
 	}
 
 	return res.ScanJSON(obj)
