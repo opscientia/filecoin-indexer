@@ -159,7 +159,7 @@ $ filecoin-indexer -config config.json -cmd fetcher -mode manager
 | GET    | `/status`                         | Synchronization status         |
 | GET    | `/metrics`                        | Prometheus metrics             |
 
-For more information, see [Miner Reputation System API](https://learn.figment.io/network-documentation/filecoin/rpc-and-rest-api/miner-reputation-system-api).
+For more information, see [Miner Reputation System API](https://docs.figment.io/network-documentation/filecoin/rpc-and-rest-api/miner-reputation-system-api).
 
 ## Score Calculation
 
