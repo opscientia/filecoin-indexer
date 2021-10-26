@@ -5,7 +5,7 @@ import (
 
 	"github.com/figment-networks/indexing-engine/pipeline"
 	"github.com/filecoin-project/go-state-types/abi"
-	"github.com/filecoin-project/specs-actors/v2/actors/builtin"
+	"github.com/filecoin-project/specs-actors/v6/actors/builtin"
 	"github.com/shopspring/decimal"
 
 	"github.com/figment-networks/filecoin-indexer/model"
@@ -72,4 +72,7 @@ var methodNames = map[abi.MethodNum]string{
 	builtin.MethodsMiner.ConfirmUpdateWorkerKey:   "ConfirmUpdateWorkerKey",
 	builtin.MethodsMiner.RepayDebt:                "RepayDebt",
 	builtin.MethodsMiner.ChangeOwnerAddress:       "ChangeOwnerAddress",
+	builtin.MethodsMiner.DisputeWindowedPoSt:      "DisputeWindowedPoSt",
+	builtin.MethodsMiner.PreCommitSectorBatch:     "PreCommitSectorBatch",
+	builtin.MethodsMiner.ProveCommitAggregate:     "ProveCommitAggregate",
 }
