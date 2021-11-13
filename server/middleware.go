@@ -1,8 +1,10 @@
 package server
 
 import (
-	"github.com/figment-networks/indexing-engine/metrics"
-	m "github.com/figment-networks/indexing-engine/pipeline/metrics"
+	"strings"
+	"time"
+
+	"github.com/figment-networks/indexing-engine/pipeline/metrics"
 	"github.com/gin-gonic/gin"
 
 	"github.com/figment-networks/filecoin-indexer/config"
@@ -11,16 +13,17 @@ import (
 // MetricsMiddleware logs the execution time of every request
 func MetricsMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		path := c.Request.URL.Path
+		t := time.Now()
+		c.Next()
+		elapsed := time.Since(t)
 
-		if path != _metricsPath {
-			observer := m.ServerRequestDuration.WithLabels(path)
-
-			t := metrics.NewTimer(observer)
-			defer t.ObserveDuration()
+		if c.Request.URL.Path == _metricsPath {
+			return
 		}
 
-		c.Next()
+		if path := strings.Split(strings.TrimPrefix(c.Request.URL.Path, "/"), "/"); len(path) > 0 {
+			metrics.ServerRequestDuration.WithLabels(path[0]).Observe(elapsed.Seconds())
+		}
 	}
 }
 
